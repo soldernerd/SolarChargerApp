@@ -37,9 +37,24 @@ namespace SolarChargerApp
         public uint TxFailedCount { get; private set; }
         public uint RxCount { get; private set; }
         public uint RxFailedCount { get; private set; }
+        //Information obtained from the solar charger
+        public Int16 InputVoltage { get; private set; }
+        public Int16 OutputVoltage { get; private set; }
+        public Int16 InputCurrent { get; private set; }
+        public Int16 OutputCurrent { get; private set; }
+        public Int16 TemperatureOnboard { get; private set; }
+        public Int16 TemperatureExternal1 { get; private set; }
+        public Int16 TemperatureExternal2 { get; private set; }
+        public bool PowerOutput1 { get; private set; }
+        public bool PowerOutput2 { get; private set; }
+        public bool PowerOutput3 { get; private set; }
+        public bool PowerOutput4 { get; private set; }
+        public bool PowerOutputUsb { get; private set; }
+        public bool FanOutput { get; private set; }
+        public byte DisplayMode { get; private set; }
+        public DateTime SystemTime { get; private set; }
 
-
-        public Communicator()
+    public Communicator()
         {
             // Initialize variables
             _Vid = 0x04D8;
@@ -61,6 +76,28 @@ namespace SolarChargerApp
             HidUtil.RaisePacketSentEvent += PacketSentHandler;
             HidUtil.RaiseReceivePacketEvent += ReceivePacketHandler;
             HidUtil.RaisePacketReceivedEvent += PacketReceivedHandler;
+        }
+
+        //Function to parse packet received over USB
+        private void ParseStatusData(ref UsbBuffer InBuffer)
+        {
+            AdcValue = (uint)(InBuffer.buffer[5] << 8) + InBuffer.buffer[4]; //output voltage
+
+            InputVoltage = (Int16) ((InBuffer.buffer[3] << 8) + InBuffer.buffer[2]);
+            OutputVoltage = (Int16)((InBuffer.buffer[5] << 8) + InBuffer.buffer[4]);
+            InputCurrent = (Int16)((InBuffer.buffer[7] << 8) + InBuffer.buffer[6]);
+            OutputCurrent = (Int16)((InBuffer.buffer[9] << 8) + InBuffer.buffer[8]);
+            TemperatureOnboard = (Int16)((InBuffer.buffer[11] << 8) + InBuffer.buffer[10]);
+            TemperatureExternal1 = (Int16)((InBuffer.buffer[13] << 8) + InBuffer.buffer[12]);
+            TemperatureExternal2 = (Int16)((InBuffer.buffer[15] << 8) + InBuffer.buffer[14]);
+            PowerOutput1 = ((InBuffer.buffer[16] & 1) == 1);
+            PowerOutput2 = ((InBuffer.buffer[16] & 2) == 2);
+            PowerOutput3 = ((InBuffer.buffer[16] & 4) == 4);
+            PowerOutput4 = ((InBuffer.buffer[16] & 8) == 8);
+            PowerOutputUsb = ((InBuffer.buffer[16] & 16) == 16);
+            FanOutput = ((InBuffer.buffer[16] & 32) == 32);
+            DisplayMode = InBuffer.buffer[16];
+            SystemTime = DateTime.Now;
         }
 
         // Accessor for _Vid
@@ -191,8 +228,9 @@ namespace SolarChargerApp
             WaitingForDevice = false;
             if (InBuffer.buffer[1] == 0x10)
             {
+                ParseStatusData(ref InBuffer);
                 //Need to reformat the data from two unsigned chars into one unsigned int.
-                AdcValue = (uint)(InBuffer.buffer[5] << 8) + InBuffer.buffer[4]; //output voltage
+                //AdcValue = (uint)(InBuffer.buffer[5] << 8) + InBuffer.buffer[4]; //output voltage
             }
             if (InBuffer.buffer[1] == 0x37)
             {
@@ -365,17 +403,37 @@ namespace SolarChargerApp
         {
             if (PropertyChanged != null)
             {
-                PropertyChanged(this, new PropertyChangedEventArgs("UptimeTxt"));
-                PropertyChanged(this, new PropertyChangedEventArgs("LedToggleActive"));
-                PropertyChanged(this, new PropertyChangedEventArgs("PushbuttonContentTxt"));
-                PropertyChanged(this, new PropertyChangedEventArgs("PushbuttonStatusTxt"));
-                PropertyChanged(this, new PropertyChangedEventArgs("AdcValue"));
-                PropertyChanged(this, new PropertyChangedEventArgs("TxSuccessfulTxt"));
-                PropertyChanged(this, new PropertyChangedEventArgs("TxFailedTxt"));
-                PropertyChanged(this, new PropertyChangedEventArgs("RxSuccessfulTxt"));
-                PropertyChanged(this, new PropertyChangedEventArgs("RxFailedTxt"));
-                PropertyChanged(this, new PropertyChangedEventArgs("TxSpeedTxt"));
-                PropertyChanged(this, new PropertyChangedEventArgs("RxSpeedTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("InputVoltage"));
+                PropertyChanged(this, new PropertyChangedEventArgs("InputVoltageTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("OutputVoltage"));
+                PropertyChanged(this, new PropertyChangedEventArgs("OutputVoltageTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("InputCurrent"));
+                PropertyChanged(this, new PropertyChangedEventArgs("InputCurrentTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("OutputCurrent"));
+                PropertyChanged(this, new PropertyChangedEventArgs("OutputCurrentTxt"));
+
+                PropertyChanged(this, new PropertyChangedEventArgs("InputPower"));
+                PropertyChanged(this, new PropertyChangedEventArgs("InputPowerTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("OutputPower"));
+                PropertyChanged(this, new PropertyChangedEventArgs("OutputPowerTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("Loss"));
+                PropertyChanged(this, new PropertyChangedEventArgs("LossTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("Efficiency"));
+                PropertyChanged(this, new PropertyChangedEventArgs("EfficiencyTxt"));
+
+                PropertyChanged(this, new PropertyChangedEventArgs("Output1Txt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("Output2Txt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("Output3Txt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("Output4Txt"));
+
+                PropertyChanged(this, new PropertyChangedEventArgs("UsbChargingTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("TemperatureOnboardTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("TemperatureExternal1Txt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("TemperatureExternal2Txt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("FanTxt"));
+
+
+
             }
         }
 
@@ -638,6 +696,227 @@ namespace SolarChargerApp
                 return "RX Speed: n/a";
             }
         }
+
+        // New bindings
+
+        public Int16 InputVoltage
+        {
+            get
+            {
+                return communicator.InputVoltage;
+            }
+        }
+
+        public string InputVoltageTxt
+        {
+            get
+            {
+                return string.Format("{0:0.000}V", (float) communicator.InputVoltage/1000.0);
+            }
+        }
+
+        public Int16 OutputVoltage
+        {
+            get
+            {
+                return communicator.OutputVoltage;
+            }
+        }
+
+        public string OutputVoltageTxt
+        {
+            get
+            {
+                return string.Format("{0:0.000}V", (float) communicator.OutputVoltage/ 1000.0);
+            }
+        }
+
+        public Int16 InputCurrent
+        {
+            get
+            {
+                return communicator.InputCurrent;
+            }
+        }
+
+        public string InputCurrentTxt
+        {
+            get
+            {
+                return string.Format("{0:0.000}A", (float) communicator.InputCurrent / 1000.0);
+            }
+        }
+
+        public Int16 OutputCurrent
+        {
+            get
+            {
+                return communicator.OutputCurrent;
+            }
+        }
+
+        public string OutputCurrentTxt
+        {
+            get
+            {
+                return string.Format("{0:0.000}A", (float) communicator.OutputCurrent / 1000.0);
+            }
+        }
+
+        public int InputPower
+        {
+            get
+            {
+                return (communicator.InputVoltage * communicator.InputCurrent) / 1000;
+            }
+        }
+
+        public string InputPowerTxt
+        {
+            get
+            {
+                return string.Format("Input: {0:0.000}W", (float) ((communicator.InputVoltage * communicator.InputCurrent) / 1000000.0));
+            }
+        }
+
+        public int OutputPower
+        {
+            get
+            {
+                return (communicator.OutputVoltage * communicator.OutputCurrent) / 1000;
+            }
+        }
+
+        public string OutputPowerTxt
+        {
+            get
+            {
+                return string.Format("Output: {0:0.000}W", (float)((communicator.OutputVoltage * communicator.OutputCurrent) / 1000000.0));
+            }
+        }
+
+        public int Loss
+        {
+            get
+            {
+                return ((communicator.InputVoltage * communicator.InputCurrent) - (communicator.OutputVoltage * communicator.OutputCurrent)) / 1000;
+            }
+        }
+
+        public string LossTxt
+        {
+            get
+            {
+                return string.Format("Loss: {0:0.000}W", (float)(((communicator.InputVoltage * communicator.InputCurrent) - (communicator.OutputVoltage * communicator.OutputCurrent)) / 1000000.0));
+            }
+        }
+
+        public int Efficiency
+        {
+            get
+            {
+                return (100 * (communicator.OutputVoltage * communicator.OutputCurrent) / (communicator.InputVoltage * communicator.InputCurrent));
+            }
+        }
+
+        public string EfficiencyTxt
+        {
+            get
+            {
+                return string.Format("Efficiency: {0:0.00}%", (float)(100 * (communicator.OutputVoltage * communicator.OutputCurrent) / (communicator.InputVoltage * communicator.InputCurrent)));
+            }
+        }
+
+        public string Output1Txt
+        {
+            get
+            {
+                if (communicator.PowerOutput1)
+                    return "Output 1 on";
+                else
+                    return "Output 1 off";
+            }
+        }
+
+        public string Output2Txt
+        {
+            get
+            {
+                if (communicator.PowerOutput2)
+                    return "Output 2 on";
+                else
+                    return "Output 2 off";
+            }
+        }
+
+        public string Output3Txt
+        {
+            get
+            {
+                if (communicator.PowerOutput3)
+                    return "Output 3 on";
+                else
+                    return "Output 3 off";
+            }
+        }
+
+        public string Output4Txt
+        {
+            get
+            {
+                if (communicator.PowerOutput4)
+                    return "Output 4 on";
+                else
+                    return "Output 4 off";
+            }
+        }
+
+        public string UsbChargingTxt
+        {
+            get
+            {
+                if (communicator.PowerOutputUsb)
+                    return "USB Charger on";
+                else
+                    return "USB Charger off";
+            }
+        }
+
+        public string TemperatureOnboardTxt
+        {
+            get
+            {
+                return string.Format("Onboard: {0:0.0}°C", (float) communicator.TemperatureOnboard/100);
+            }
+        }
+
+        public string TemperatureExternal1Txt
+        {
+            get
+            {
+                return string.Format("External 1: {0:0.0}°C", (float)communicator.TemperatureExternal1 / 100);
+            }
+        }
+
+        public string TemperatureExternal2Txt
+        {
+            get
+            {
+                return string.Format("External 2: {0:0.0}°C", (float)communicator.TemperatureExternal2 / 100);
+            }
+        }
+
+        public string FanTxt
+        {
+            get
+            {
+                if (communicator.FanOutput)
+                    return "Fan on";
+                else
+                    return "Fan off";
+            }
+        }
+
 
     }
 
