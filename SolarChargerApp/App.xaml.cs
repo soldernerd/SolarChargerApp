@@ -28,7 +28,7 @@ namespace SolarChargerApp
         public HidUtility HidUtil { get; set; }
         private ushort _Vid;
         private ushort _Pid;
-        public bool LedTogglePending { get; private set; }
+        private List<byte> PendingCommands;
         public bool WaitingForDevice { get; private set; }
         private byte LastCommand;
         public uint AdcValue { get; private set; }
@@ -60,8 +60,12 @@ namespace SolarChargerApp
         public byte BuckMode { get; private set; }
         public byte BuckDutyCycle { get; private set; }
         public string[] Display { get; private set; } = new string[4];
+        //Others
+        private bool _NewStatusAvailable;
+        private bool _NewDisplay1Available;
+        private bool _NewDisplay2Available;
 
-    public Communicator()
+        public Communicator()
         {
             // Initialize variables
             _Vid = 0x04D8;
@@ -70,8 +74,11 @@ namespace SolarChargerApp
             TxFailedCount = 0;
             RxCount = 0;
             RxFailedCount = 0;
-            LedTogglePending = false;
+            PendingCommands = new List<byte>();
             LastCommand = 0x12;
+            _NewStatusAvailable = false;
+            _NewDisplay1Available = false;
+            _NewDisplay2Available = false;
 
             // Obtain and initialize an instance of HidUtility
             HidUtil = new HidUtility();
@@ -91,6 +98,40 @@ namespace SolarChargerApp
             uint lower = (uint) (bcd & 0x0F);
             uint upper = (uint) (bcd >> 4);
             return (10 * upper) + lower;
+        }
+
+        //Accessors for the UI to call
+        public bool NewStatusAvailable
+        {
+            get
+            {
+                if (_NewStatusAvailable)
+                {
+                    _NewStatusAvailable = false;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        public bool NewDisplayAvailable
+        {
+            get
+            {
+                if (_NewDisplay1Available && _NewDisplay2Available)
+                {
+                    _NewDisplay1Available = false;
+                    _NewDisplay2Available = false;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
         }
 
         //Function to parse packet received over USB
@@ -133,6 +174,8 @@ namespace SolarChargerApp
             SystemTime = new DateTime((int) Year, (int) Month, (int) Day, (int) Hour, (int) Minute, (int) Second);
             BuckMode = InBuffer.buffer[24];
             BuckDutyCycle = InBuffer.buffer[25];
+            //New status data is now available
+            _NewStatusAvailable = true;
         }
 
         //Function to parse packet received over USB
@@ -147,6 +190,8 @@ namespace SolarChargerApp
                     Display[line] += character.ToString();
                 }
             }
+            //New display1 data is now available
+            _NewDisplay1Available = true;
         }
 
         //Function to parse packet received over USB
@@ -161,6 +206,8 @@ namespace SolarChargerApp
                     Display[line] += character.ToString();
                 }
             }
+            //New display2 data is now available
+            _NewDisplay2Available = true;
         }
 
         // Accessor for _Vid
@@ -212,7 +259,7 @@ namespace SolarChargerApp
                 TxFailedCount = 0;
                 RxCount = 0;
                 RxFailedCount = 0;
-                LedTogglePending = false;
+                PendingCommands = new List<byte>();
                 LastCommand = 0x81;
             }
         }
@@ -232,12 +279,6 @@ namespace SolarChargerApp
             {
                 case 0x10:
                     OutBuffer.buffer[1] = 0x11;
-                    
-                    OutBuffer.buffer[2] = 0x31;
-                    OutBuffer.buffer[3] = 0x33;
-                    OutBuffer.buffer[4] = 0x35;
-                    OutBuffer.buffer[5] = 0x37;
-                    OutBuffer.buffer[6] = 0x39;
                     LastCommand = 0x11;
                     break;
                 case 0x11:
@@ -253,6 +294,19 @@ namespace SolarChargerApp
                     LastCommand = 0x10;
                     break;
             };
+
+            for(int i=2; i<65; ++i)
+            {
+                if(PendingCommands.Count!=0)
+                {
+                    OutBuffer.buffer[i] = PendingCommands[0];
+                    PendingCommands.RemoveAt(0);
+                }
+                else
+                {
+                    break;
+                }
+            }
 
             //Request the packet to be sent over the bus
             OutBuffer.RequestTransfer = true;
@@ -311,15 +365,84 @@ namespace SolarChargerApp
         }
 
 
-        public bool RequestLedToggleValid()
+        public bool RequestToggleValid()
         {
-            return !LedTogglePending;
+            //return !LedTogglePending;
+            return true;
         }
 
-        public void RequestLedToggle()
+        public void RequestOut1Toggle()
         {
-            LedTogglePending = true;
+            if(PowerOutput1)
+            {
+                PendingCommands.Add(0x30);
+            }
+            else
+            {
+                PendingCommands.Add(0x31);
+            }
         }
+
+        public void RequestOut2Toggle()
+        {
+            if (PowerOutput2)
+            {
+                PendingCommands.Add(0x32);
+            }
+            else
+            {
+                PendingCommands.Add(0x33);
+            }
+        }
+
+        public void RequestOut3Toggle()
+        {
+            if (PowerOutput3)
+            {
+                PendingCommands.Add(0x34);
+            }
+            else
+            {
+                PendingCommands.Add(0x35);
+            }
+        }
+
+        public void RequestOut4Toggle()
+        {
+            if (PowerOutput4)
+            {
+                PendingCommands.Add(0x36);
+            }
+            else
+            {
+                PendingCommands.Add(0x37);
+            }
+        }
+
+        public void RequestUsbToggle()
+        {
+            if (PowerOutputUsb)
+            {
+                PendingCommands.Add(0x38);
+            }
+            else
+            {
+                PendingCommands.Add(0x39);
+            }
+        }
+
+        public void RequestFanToggle()
+        {
+            if (FanOutput)
+            {
+                PendingCommands.Add(0x3A);
+            }
+            else
+            {
+                PendingCommands.Add(0x3B);
+            }
+        }
+
     } // Communicator
 
     /*
@@ -354,9 +477,6 @@ namespace SolarChargerApp
     {
         private Communicator communicator;
         DispatcherTimer timer;
-        private int timerCount;
-        private UiCommand buttonCommand;
-        private UiCommand ToggleUsbOutputCommand;
         private DateTime ConnectedTimestamp = DateTime.Now;
         public string ActivityLogTxt { get; private set; }
 
@@ -369,13 +489,11 @@ namespace SolarChargerApp
             communicator.HidUtil.RaiseDeviceRemovedEvent += DeviceRemovedEventHandler;
             communicator.HidUtil.RaiseConnectionStatusChangedEvent += ConnectionStatusChangedHandler;
 
-            buttonCommand = new UiCommand(this.RequestLedToggle, communicator.RequestLedToggleValid);
-            ToggleUsbOutputCommand = new UiCommand(this.RequestLedToggle, communicator.RequestLedToggleValid);
+
 
             WriteLog("Program started", true);
 
             //Configure and start timer
-            timerCount = 0;
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(50);
             timer.Tick += TimerTickHandler;
@@ -401,44 +519,94 @@ namespace SolarChargerApp
             }
         }
 
-        public void RequestLedToggle()
+        public void RequestOut1Toggle()
         {
-            WriteLog("Toggle LED button clicked", false);
-            communicator.RequestLedToggle();
+            WriteLog("Toggle Out1 button clicked", false);
+            communicator.RequestOut1Toggle();
             if (PropertyChanged != null)
             {
-                PropertyChanged(this, new PropertyChangedEventArgs("LedToggleActive"));
-                PropertyChanged(this, new PropertyChangedEventArgs("PushbuttonContentTxt"));
-                PropertyChanged(this, new PropertyChangedEventArgs("LedTogglePendingTxt"));
                 PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
             }
         }
 
-        public ICommand ToggleClick
+
+        public void RequestOut2Toggle()
         {
-            get
+            WriteLog("Toggle Out2 button clicked", false);
+            communicator.RequestOut2Toggle();
+            if (PropertyChanged != null)
             {
-                return buttonCommand;
+                PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
             }
         }
 
-        public ICommand ToggleUsbOutput
+        public void RequestOut3Toggle()
         {
-            get
+            WriteLog("Toggle Out3 button clicked", false);
+            communicator.RequestOut3Toggle();
+            if (PropertyChanged != null)
             {
-                return ToggleUsbOutputCommand;
+                PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
             }
         }
 
-        public bool LedToggleActive
+        public void RequestOut4Toggle()
+        {
+            WriteLog("Toggle Out4 button clicked", false);
+            communicator.RequestOut4Toggle();
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
+            }
+        }
+
+        public void RequestUsbToggle()
+        {
+            WriteLog("Toggle Usb button clicked", false);
+            communicator.RequestUsbToggle();
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
+            }
+        }
+
+        public ICommand Out1ToggleClick
         {
             get
             {
-                if(communicator.HidUtil.ConnectionStatus==HidUtility.UsbConnectionStatus.Connected)
-                {
-                    return communicator.RequestLedToggleValid();
-                }
-                return false;
+                return new UiCommand(this.RequestOut1Toggle, communicator.RequestToggleValid);
+            }
+        }
+
+        public ICommand Out2ToggleClick
+        {
+            get
+            {
+                return new UiCommand(this.RequestOut2Toggle, communicator.RequestToggleValid);
+            }
+        }
+
+        public ICommand Out3ToggleClick
+        {
+            get
+            {
+                return new UiCommand(this.RequestOut3Toggle, communicator.RequestToggleValid);
+            }
+        }
+
+        public ICommand Out4ToggleClick
+        {
+            get
+            {
+                return new UiCommand(this.RequestOut4Toggle, communicator.RequestToggleValid);
+            }
+        }
+
+        public ICommand UsbToggleClick
+        {
+            get
+            {
+                return new UiCommand(this.RequestUsbToggle, communicator.RequestToggleValid);
             }
         }
 
@@ -468,49 +636,41 @@ namespace SolarChargerApp
         {
             if (PropertyChanged != null)
             {
-                ++timerCount;
-
-                switch(timerCount)
+                if (communicator.NewStatusAvailable)
                 {
-                    case 0:
-                        PropertyChanged(this, new PropertyChangedEventArgs("InputVoltage"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("InputVoltageTxt"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("OutputVoltage"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("OutputVoltageTxt"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("InputCurrent"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("InputCurrentTxt"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("OutputCurrent"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("OutputCurrentTxt"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("InputPower"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("InputPowerTxt"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("OutputPower"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("OutputPowerTxt"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("Loss"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("LossTxt"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("Efficiency"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("EfficiencyTxt"));
-                        break;
-
-                    case 1:
-                        PropertyChanged(this, new PropertyChangedEventArgs("Output1Txt"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("Output2Txt"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("Output3Txt"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("Output4Txt"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("UsbChargingTxt"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("TemperatureOnboardTxt"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("TemperatureExternal1Txt"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("TemperatureExternal2Txt"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("FanTxt"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("DateTxt"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("TimeTxt"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("BuckModeTxt"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("DutyCycleTxt"));
-                        break;
-
-                    case 2:
-                        PropertyChanged(this, new PropertyChangedEventArgs("DisplayTxt"));
-                        timerCount = -1;
-                        break;
+                    PropertyChanged(this, new PropertyChangedEventArgs("InputVoltage"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("InputVoltageTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("OutputVoltage"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("OutputVoltageTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("InputCurrent"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("InputCurrentTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("OutputCurrent"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("OutputCurrentTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("InputPower"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("InputPowerTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("OutputPower"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("OutputPowerTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("Loss"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("LossTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("Efficiency"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("EfficiencyTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("Output1Txt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("Output2Txt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("Output3Txt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("Output4Txt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("UsbChargingTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("TemperatureOnboardTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("TemperatureExternal1Txt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("TemperatureExternal2Txt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("FanTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("DateTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("TimeTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("BuckModeTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("DutyCycleTxt"));
+                }
+                if (communicator.NewDisplayAvailable)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("DisplayTxt"));
                 }
             }
         }
@@ -562,16 +722,6 @@ namespace SolarChargerApp
             }
         }
 
-        public string LedTogglePendingTxt
-        {
-            get
-            {
-                if (communicator.LedTogglePending)
-                    return "Toggle pending";
-                else
-                    return "No action pending";
-            }
-        }
 
         public string DeviceListTxt
         {
@@ -595,17 +745,6 @@ namespace SolarChargerApp
                     return "Pushbutton pressed";
                 else
                     return "Pushbutton not pressed";
-            }
-        }
-
-        public string PushbuttonContentTxt
-        {
-            get
-            {
-                if (communicator.LedTogglePending)
-                    return "Toggle pending...";
-                else
-                    return "Toggle LED";
             }
         }
 
