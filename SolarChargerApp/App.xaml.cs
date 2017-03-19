@@ -92,12 +92,23 @@ namespace SolarChargerApp
             HidUtil.RaisePacketReceivedEvent += PacketReceivedHandler;
         }
 
-        //Convert binary coded decimal to integer
+        //Convert binary coded decimal byte to integer
         private uint BcdToUint(byte bcd)
         {
             uint lower = (uint) (bcd & 0x0F);
             uint upper = (uint) (bcd >> 4);
             return (10 * upper) + lower;
+        }
+
+        //Convert integer to binary encoded decimal byte
+        private byte UintToBcd(uint val)
+        {
+            uint lower = val % 10;
+            uint upper = val / 10;
+            byte retval = (byte) upper;
+            retval <<= 4;
+            retval |= (byte)lower;
+            return retval;
         }
 
         //Accessors for the UI to call
@@ -470,40 +481,40 @@ namespace SolarChargerApp
             PendingCommands.Add(0x3E);
         }
 
-        public void SetYear(byte year)
+        public void SetYear(uint year)
         {
             PendingCommands.Add(0x40);
-            PendingCommands.Add(year);
+            PendingCommands.Add(UintToBcd(year));
         }
 
-        public void SetMonth(byte month)
+        public void SetMonth(uint month)
         {
             PendingCommands.Add(0x41);
-            PendingCommands.Add(month);
+            PendingCommands.Add(UintToBcd(month));
         }
 
-        public void SetDay(byte day)
+        public void SetDay(uint day)
         {
             PendingCommands.Add(0x42);
-            PendingCommands.Add(day);
+            PendingCommands.Add(UintToBcd(day));
         }
 
-        public void SetHour(byte hour)
+        public void SetHour(uint hour)
         {
             PendingCommands.Add(0x43);
-            PendingCommands.Add(hour);
+            PendingCommands.Add(UintToBcd(hour));
         }
 
-        public void SetMinute(byte minute)
+        public void SetMinute(uint minute)
         {
             PendingCommands.Add(0x44);
-            PendingCommands.Add(minute);
+            PendingCommands.Add(UintToBcd(minute));
         }
 
-        public void SetSecond(byte second)
+        public void SetSecond(uint second)
         {
             PendingCommands.Add(0x45);
-            PendingCommands.Add(second);
+            PendingCommands.Add(UintToBcd(second));
         }
 
         public void EnableManualControl()
@@ -725,12 +736,12 @@ namespace SolarChargerApp
         public void UseSystemTime()
         {
             WriteLog("Date and time set to system time", false);
-            communicator.SetYear((byte)(DateTime.Now.Year-2000));
-            communicator.SetMonth((byte)DateTime.Now.Month);
-            communicator.SetDay((byte)DateTime.Now.Day);
-            communicator.SetHour((byte)DateTime.Now.Hour);
-            communicator.SetMinute((byte)DateTime.Now.Minute);
-            communicator.SetSecond((byte)DateTime.Now.Second);
+            communicator.SetYear((uint)(DateTime.Now.Year-2000));
+            communicator.SetMonth((uint)DateTime.Now.Month);
+            communicator.SetDay((uint)DateTime.Now.Day);
+            communicator.SetHour((uint)DateTime.Now.Hour);
+            communicator.SetMinute((uint)DateTime.Now.Minute);
+            communicator.SetSecond((uint)DateTime.Now.Second);
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
