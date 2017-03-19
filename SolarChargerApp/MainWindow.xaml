@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SolarChargerApp"
         mc:Ignorable="d"
-        Title="Soldernerd Solar Charger App" Height="700" Width="610" MinWidth="610" MinHeight="700">
+        Title="Soldernerd Solar Charger App" Height="750" Width="610" MinWidth="610" MinHeight="700">
 
     <Window.Resources>
         <local:CommunicatorViewModel x:Key="CommunicatorVM"/>
@@ -22,7 +22,7 @@
             <RowDefinition MinHeight="100" />
             <RowDefinition MinHeight="100" />
             <RowDefinition MinHeight="150" />
-            <RowDefinition MinHeight="150" />
+            <RowDefinition MinHeight="200" />
             <RowDefinition MinHeight="150" />
         </Grid.RowDefinitions>
 
@@ -116,7 +116,6 @@
                     <RowDefinition Height="1*" />
                     <RowDefinition Height="1*" />
                     <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
                 </Grid.RowDefinitions>
                 <TextBlock Name="Output1_TextBlock" Grid.Column="0" Grid.Row="0" Margin="10,5" 
                     Text="{Binding Output1Txt, Source={StaticResource CommunicatorVM}}"/>
@@ -150,7 +149,6 @@
                     <RowDefinition Height="1*" />
                     <RowDefinition Height="1*" />
                     <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
                 </Grid.RowDefinitions>
                 <TextBlock Name="UsbCharging_TextBlock" Grid.Column="0" Grid.Row="0" Margin="10,5" 
                     Text="{Binding UsbChargingTxt, Source={StaticResource CommunicatorVM}}"/>
@@ -165,7 +163,6 @@
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="1*" />
                     <RowDefinition Height="1*" />
                     <RowDefinition Height="1*" />
                     <RowDefinition Height="1*" />
@@ -192,12 +189,14 @@
                     <RowDefinition Height="1*" />
                     <RowDefinition Height="1*" />
                     <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
                 </Grid.RowDefinitions>
-                <TextBlock Name="Date_TextBlock" Grid.Column="0" Grid.Row="0" Margin="10,5" 
+                <TextBlock Name="Date_TextBlock" Grid.Row="0" Grid.Column="0" Margin="10,5" 
                     Text="{Binding DateTxt, Source={StaticResource CommunicatorVM}}"/>
-                <TextBlock Name="Time_TextBlock" Grid.Column="0" Grid.Row="1" Margin="10,5" 
+                <TextBlock Name="Time_TextBlock" Grid.Row="1" Grid.Column="0"  Margin="10,5" 
                     Text="{Binding TimeTxt, Source={StaticResource CommunicatorVM}}"/>
+                <Button Name="SystemTime_Button" Grid.Row="2" Grid.Column="0" Margin="2,2"
+                    Content="Use system time"
+                    Command="{Binding UseSystemTimeClick, Source={StaticResource CommunicatorVM}}"/>
             </Grid>
         </GroupBox>
 
@@ -207,22 +206,67 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="1*" />
                     <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
                 </Grid.RowDefinitions>
-                <TextBlock Name="BuckMode_TextBlock" Grid.Column="0" Grid.Row="0" Margin="10,5" 
+                <TextBlock Name="BuckMode_TextBlock" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" Margin="10,5" 
                     Text="{Binding BuckModeTxt, Source={StaticResource CommunicatorVM}}"/>
-                <TextBlock Name="DutyCycle_TextBlock" Grid.Column="0" Grid.Row="1" Margin="10,5" 
+                <TextBlock Name="DutyCycle_TextBlock" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Margin="10,5" 
                     Text="{Binding DutyCycleTxt, Source={StaticResource CommunicatorVM}}"/>
+                <CheckBox x:Name="Manual_CheckBox" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                    Content="Manual Control" HorizontalAlignment="Left" Margin="10,10"
+                    IsChecked="{Binding ManualControl, Source={StaticResource CommunicatorVM}}"/>
+
+                <CheckBox x:Name="SynchronousMode_CheckBox" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                    Content="Synchronous Mode" HorizontalAlignment="Left" Margin="10,10"
+                    IsChecked="{Binding SynchronousMode, Source={StaticResource CommunicatorVM}}"/>
+                <Button Name="ChargerOnOff_Button" Grid.Row="3" Grid.Column="2"  Grid.ColumnSpan="2"
+                    Margin="10,5" 
+                    Content="{Binding OnOffButtonTxt, Source={StaticResource CommunicatorVM}}"
+                    Command="{Binding ChargerOnOffClick, Source={StaticResource CommunicatorVM}}"/>
+                
+                <TextBox Name="DutyCycleInput_TextBox" Grid.Row="4" Grid.Column="0"
+                        Background="WhiteSmoke" Margin="10,5"
+                        Text="{Binding DutyCycleInputTxt, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Source={StaticResource CommunicatorVM}}" />
+                <Button Name="SetDutyCycle_Button" Grid.Row="4" Grid.Column="1" Margin="10,5" Content="Set"
+                    Command="{Binding SetDutycycleClick, Source={StaticResource CommunicatorVM}}"/>
+                <Button Name="DecreaseDutyCycle_Button" Grid.Row="4" Grid.Column="2" Margin="10,5" Content="-"
+                    Command="{Binding DecreaseDutycycleClick, Source={StaticResource CommunicatorVM}}"/>
+                <Button Name="IncreaseDutyCycle_Button" Grid.Row="4" Grid.Column="3" Margin="10,5" Content="+"
+                    Command="{Binding IncreaseDutycycleClick, Source={StaticResource CommunicatorVM}}"/>
             </Grid>
         </GroupBox>
 
-        <GroupBox Header="Display" Name="Display_GroupBox" Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2" Margin="10,10,10,10">
-            <TextBox Name="Display_TextBox" Background="SteelBlue" Foreground="White" FontFamily="Global Monospace" Margin="10,10"
-                FontSize="17" FontWeight="Bold" IsReadOnly="True" MaxLines="4" MinLines="4" MaxLength="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
-                Text="{Binding DisplayTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
+        <GroupBox Header="User Interface" Name="UserInterface_GroupBox" Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2" Margin="10,10,10,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="3*" />
+                </Grid.RowDefinitions>
+                <Button Name="TurnLeft_Button" Grid.Column="0" Grid.Row="0" Margin="10,10,10,0" Content="&lt;-"
+                    Command="{Binding TurnLeftClick, Source={StaticResource CommunicatorVM}}"/>
+                <Button Name="PushButton_Button" Grid.Column="1" Grid.Row="0" Margin="10,10,10,0" Content="Press"
+                    Command="{Binding ButtonPressClick, Source={StaticResource CommunicatorVM}}"/>
+                <Button Name="TurnRight_Button" Grid.Column="2" Grid.Row="0" Margin="10,10,10,0" Content="-&gt;"
+                    Command="{Binding TurnRightClick, Source={StaticResource CommunicatorVM}}"/>
+                <TextBox  Name="Display_TextBox" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3"
+                    Background="SteelBlue" Foreground="White" FontFamily="Global Monospace" Margin="10,10"
+                    FontSize="17" FontWeight="Bold" IsReadOnly="True" MaxLines="4" MinLines="4" MaxLength="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
+                    Text="{Binding DisplayTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
+            </Grid>
         </GroupBox>
 
         <!-- Row 4, debugging log -->

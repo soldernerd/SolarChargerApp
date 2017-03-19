@@ -295,12 +295,25 @@ namespace SolarChargerApp
                     break;
             };
 
-            for(int i=2; i<65; ++i)
+            for(int i=2; i<64; ++i)
             {
                 if(PendingCommands.Count!=0)
                 {
-                    OutBuffer.buffer[i] = PendingCommands[0];
-                    PendingCommands.RemoveAt(0);
+                    // 2-byte commands
+                    // Make sure both bytes are transmitted in the same packet
+                    if((PendingCommands[0] & 0xF0)==0x40)
+                    {
+                        OutBuffer.buffer[i] = PendingCommands[0];
+                        PendingCommands.RemoveAt(0);
+                        ++i;
+                        OutBuffer.buffer[i] = PendingCommands[0];
+                        PendingCommands.RemoveAt(0);
+                    }
+                    else // Regular 1-byte command
+                    {
+                        OutBuffer.buffer[i] = PendingCommands[0];
+                        PendingCommands.RemoveAt(0);
+                    }
                 }
                 else
                 {
@@ -365,9 +378,8 @@ namespace SolarChargerApp
         }
 
 
-        public bool RequestToggleValid()
+        public bool RequestValid()
         {
-            //return !LedTogglePending;
             return true;
         }
 
@@ -443,6 +455,113 @@ namespace SolarChargerApp
             }
         }
 
+        public void RequestTurnLeft()
+        {
+            PendingCommands.Add(0x3C);
+        }
+
+        public void RequestTurnRight()
+        {
+            PendingCommands.Add(0x3D);
+        }
+
+        public void RequestButtonPress()
+        {
+            PendingCommands.Add(0x3E);
+        }
+
+        public void SetYear(byte year)
+        {
+            PendingCommands.Add(0x40);
+            PendingCommands.Add(year);
+        }
+
+        public void SetMonth(byte month)
+        {
+            PendingCommands.Add(0x41);
+            PendingCommands.Add(month);
+        }
+
+        public void SetDay(byte day)
+        {
+            PendingCommands.Add(0x42);
+            PendingCommands.Add(day);
+        }
+
+        public void SetHour(byte hour)
+        {
+            PendingCommands.Add(0x43);
+            PendingCommands.Add(hour);
+        }
+
+        public void SetMinute(byte minute)
+        {
+            PendingCommands.Add(0x44);
+            PendingCommands.Add(minute);
+        }
+
+        public void SetSecond(byte second)
+        {
+            PendingCommands.Add(0x45);
+            PendingCommands.Add(second);
+        }
+
+        public void EnableManualControl()
+        {
+            PendingCommands.Add(0x46);
+            PendingCommands.Add(0x00);
+        }
+
+        public void DisableManualControl()
+        {
+            PendingCommands.Add(0x47);
+            PendingCommands.Add(0x00);
+        }
+
+        public void RequestChargerOn()
+        {
+            PendingCommands.Add(0x48);
+            PendingCommands.Add(0x00);
+        }
+
+        public void RequestChargerOff()
+        {
+            PendingCommands.Add(0x49);
+            PendingCommands.Add(0x00);
+        }
+
+        public void RequestAsynchronousMode()
+        {
+            PendingCommands.Add(0x4A);
+            PendingCommands.Add(0x00);
+        }
+
+        public void RequestSynchronousMode()
+        {
+            PendingCommands.Add(0x4B);
+            PendingCommands.Add(0x00);
+        }
+
+        public void RequestIncreaseDutycycle()
+        {
+            PendingCommands.Add(0x4C);
+            PendingCommands.Add(0x00);
+        }
+
+        public void RequestDecreaseDutycycle()
+        {
+            PendingCommands.Add(0x4D);
+            PendingCommands.Add(0x00);
+        }
+
+        public void SetDutycycle(byte dutycycle)
+        {
+            PendingCommands.Add(0x4E);
+            PendingCommands.Add(dutycycle);
+        }
+
+
+
     } // Communicator
 
     /*
@@ -479,6 +598,9 @@ namespace SolarChargerApp
         DispatcherTimer timer;
         private DateTime ConnectedTimestamp = DateTime.Now;
         public string ActivityLogTxt { get; private set; }
+        private byte DutycycleInput;
+        private bool _ManualControl = false;
+        private bool _SynchronousMode = false;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -570,11 +692,104 @@ namespace SolarChargerApp
             }
         }
 
+        public void RequestTurnLeft()
+        {
+            WriteLog("Turn left button clicked", false);
+            communicator.RequestTurnLeft();
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
+            }
+        }
+
+        public void RequestTurnRight()
+        {
+            WriteLog("Turn right button clicked", false);
+            communicator.RequestTurnRight();
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
+            }
+        }
+
+        public void RequestButtonPress()
+        {
+            WriteLog("Press button clicked", false);
+            communicator.RequestButtonPress();
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
+            }
+        }
+
+        public void UseSystemTime()
+        {
+            WriteLog("Date and time set to system time", false);
+            communicator.SetYear((byte)(DateTime.Now.Year-2000));
+            communicator.SetMonth((byte)DateTime.Now.Month);
+            communicator.SetDay((byte)DateTime.Now.Day);
+            communicator.SetHour((byte)DateTime.Now.Hour);
+            communicator.SetMinute((byte)DateTime.Now.Minute);
+            communicator.SetSecond((byte)DateTime.Now.Second);
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
+            }
+        }
+
+        public void ChargerOnOff()
+        {
+            if(OnOffButtonTxt=="Turn charger on")
+            {
+                WriteLog("Charger on button clicked", false);
+                communicator.RequestChargerOn();
+            }
+            else
+            {
+                WriteLog("Charger off button clicked", false);
+                communicator.RequestChargerOff();
+            }
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
+            }
+        }
+
+        public void RequestIncreaseDutycycle()
+        {
+            WriteLog("Increase dutycycle button clicked", false);
+            communicator.RequestIncreaseDutycycle();
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
+            }
+        }
+
+        public void RequestDecreaseDutycycle()
+        {
+            WriteLog("Decrease dutycycle button clicked", false);
+            communicator.RequestDecreaseDutycycle();
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
+            }
+        }
+
+        public void SetDutycycle()
+        {
+            WriteLog(string.Format("Set dutycycle to {0}", DutycycleInput.ToString()), false);
+            communicator.SetDutycycle(DutycycleInput);
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
+            }
+        }
+
         public ICommand Out1ToggleClick
         {
             get
             {
-                return new UiCommand(this.RequestOut1Toggle, communicator.RequestToggleValid);
+                return new UiCommand(this.RequestOut1Toggle, communicator.RequestValid);
             }
         }
 
@@ -582,7 +797,7 @@ namespace SolarChargerApp
         {
             get
             {
-                return new UiCommand(this.RequestOut2Toggle, communicator.RequestToggleValid);
+                return new UiCommand(this.RequestOut2Toggle, communicator.RequestValid);
             }
         }
 
@@ -590,7 +805,7 @@ namespace SolarChargerApp
         {
             get
             {
-                return new UiCommand(this.RequestOut3Toggle, communicator.RequestToggleValid);
+                return new UiCommand(this.RequestOut3Toggle, communicator.RequestValid);
             }
         }
 
@@ -598,7 +813,7 @@ namespace SolarChargerApp
         {
             get
             {
-                return new UiCommand(this.RequestOut4Toggle, communicator.RequestToggleValid);
+                return new UiCommand(this.RequestOut4Toggle, communicator.RequestValid);
             }
         }
 
@@ -606,7 +821,72 @@ namespace SolarChargerApp
         {
             get
             {
-                return new UiCommand(this.RequestUsbToggle, communicator.RequestToggleValid);
+                return new UiCommand(this.RequestUsbToggle, communicator.RequestValid);
+            }
+        }
+
+        public ICommand TurnLeftClick
+        {
+            get
+            {
+                return new UiCommand(this.RequestTurnLeft, communicator.RequestValid);
+            }
+        }
+
+        public ICommand TurnRightClick
+        {
+            get
+            {
+                return new UiCommand(this.RequestTurnRight, communicator.RequestValid);
+            }
+        }
+
+        public ICommand ButtonPressClick
+        {
+            get
+            {
+                return new UiCommand(this.RequestButtonPress, communicator.RequestValid);
+            }
+        }
+
+
+        public ICommand UseSystemTimeClick
+        {
+            get
+            {
+                return new UiCommand(this.UseSystemTime, communicator.RequestValid);
+            }
+        }
+
+        public ICommand DecreaseDutycycleClick
+        {
+            get
+            {
+                return new UiCommand(this.RequestDecreaseDutycycle, communicator.RequestValid);
+            }
+        }
+
+        public ICommand IncreaseDutycycleClick
+        {
+            get
+            {
+                return new UiCommand(this.RequestIncreaseDutycycle, communicator.RequestValid);
+            }
+        }
+
+        public ICommand SetDutycycleClick
+        {
+            get
+            {
+                return new UiCommand(this.SetDutycycle, communicator.RequestValid);
+            }
+        }
+
+        public ICommand ChargerOnOffClick
+        {
+            get
+            {
+                return new UiCommand(this.ChargerOnOff, communicator.RequestValid);
             }
         }
 
@@ -1189,6 +1469,94 @@ namespace SolarChargerApp
                 txt += Environment.NewLine + communicator.Display[2];
                 txt += Environment.NewLine + communicator.Display[3];
                 return txt;
+            }
+        }
+
+        public string DutyCycleInputTxt
+        {
+            set
+            {
+                try
+                {
+                    uint tmp = uint.Parse(value);
+                    DutycycleInput = (byte)tmp;
+                }
+                catch
+                {
+                    ;
+                }
+            }
+
+            get
+            {
+                return DutycycleInput.ToString();
+            }
+        }
+
+        public bool ManualControl
+        {
+            set
+            {
+                _ManualControl = value;
+                if(_ManualControl)
+                {
+                    WriteLog("Manual control enabled", false);
+                    communicator.EnableManualControl();
+                }
+                else
+                {
+                    WriteLog("Manual control disabled", false);
+                    communicator.DisableManualControl();
+                }
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
+                }
+            }
+            get
+            {
+                return _ManualControl;
+            }
+        }
+
+        public bool SynchronousMode
+        {
+            set
+            {
+                _SynchronousMode = value;
+                if (_SynchronousMode)
+                {
+                    WriteLog("Synchronous mode entered", false);
+                    communicator.EnableManualControl();
+                }
+                else
+                {
+                    WriteLog("Asynchronous mode entered", false);
+                    communicator.DisableManualControl();
+                }
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
+                }
+            }
+            get
+            {
+                return _SynchronousMode;
+            }
+        }
+
+        public string OnOffButtonTxt
+        {
+            get
+            {
+                if(communicator.BuckMode==0x00)
+                {
+                    return "Turn charger on";
+                }
+                else
+                {
+                    return "Turn charger off";
+                }
             }
         }
 
