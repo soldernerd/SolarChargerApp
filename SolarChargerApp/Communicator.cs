@@ -18,7 +18,7 @@ namespace SolarChargerApp
         public HidUtility HidUtil { get; set; }
         private ushort _Vid;
         private ushort _Pid;
-        private List<byte> PendingCommands;
+        private List<UsbCommand> PendingCommands;
         public bool WaitingForDevice { get; private set; }
         private byte LastCommand;
         public uint AdcValue { get; private set; }
@@ -65,6 +65,77 @@ namespace SolarChargerApp
         public uint[] OutputCurrentAdc { get; private set; } = { 0, 0, 0, 0 };
         public uint TimeSlot { get; private set; }
 
+        public class UsbCommand
+        {
+            public byte command { get; set; }
+            public List<byte> data { get; set; }
+
+            public UsbCommand(byte command)
+            {
+                this.command = command;
+                this.data = new List<byte>();
+            }
+
+            public UsbCommand(byte command, byte data)
+            {
+                this.command = command;
+                this.data = new List<byte>();
+                this.data.Add(data);
+            }
+
+            public UsbCommand(byte command, Int16 data)
+            {
+                this.command = command;
+                this.data = new List<byte>();
+                foreach (byte b in BitConverter.GetBytes(data))
+                {
+                    this.data.Add(b);
+                }
+            }
+
+            public UsbCommand(byte command, float data)
+            {
+                this.command = command;
+                this.data = new List<byte>();
+                foreach (byte b in BitConverter.GetBytes(data))
+                {
+                    this.data.Add(b);
+                }   
+            }
+
+            public List<byte> GetByteList()
+            {
+                switch(command & 0xF0)
+                {
+                    case 0x30:
+                        return this.GetByteList(1);
+                    case 0x40:
+                        return this.GetByteList(2);
+                    case 0x50:
+                        return this.GetByteList(2);
+                    case 0x60:
+                        return this.GetByteList(5);
+                    default:
+                        return this.GetByteList((byte) (this.data.Count + 1));
+                }
+            }
+
+            public List<byte> GetByteList(byte length)
+            {
+                List<byte> ByteList = new List<byte>();
+                ByteList.Add(command);
+                foreach(byte b in data)
+                {
+                    ByteList.Add(b);
+                }
+                while(ByteList.Count<length)
+                {
+                    ByteList.Add(0x00);
+                }
+                return ByteList;
+            }
+        }
+
 
 
         //Others
@@ -81,7 +152,7 @@ namespace SolarChargerApp
             TxFailedCount = 0;
             RxCount = 0;
             RxFailedCount = 0;
-            PendingCommands = new List<byte>();
+            PendingCommands = new List<UsbCommand>();
             LastCommand = 0x12;
             _NewStatusAvailable = false;
             _NewDisplay1Available = false;
@@ -298,7 +369,7 @@ namespace SolarChargerApp
                 TxFailedCount = 0;
                 RxCount = 0;
                 RxFailedCount = 0;
-                PendingCommands = new List<byte>();
+                PendingCommands = new List<UsbCommand();
                 LastCommand = 0x81;
             }
         }
@@ -334,29 +405,27 @@ namespace SolarChargerApp
                     break;
             };
 
-            for (int i = 2; i < 64; ++i)
+            int position = 2;
+            while(position<=64)
             {
-                if (PendingCommands.Count != 0)
+                while(PendingCommands.Count > 0)
                 {
-                    // 2-byte commands
-                    // Make sure both bytes are transmitted in the same packet
-                    if ((PendingCommands[0] & 0xF0) == 0x40)
+                    List<byte> CommandBytes = PendingCommands[0].GetByteList();
+                    //Check if entire command fits into current buffer
+                    if((64-position) <= CommandBytes.Count)
                     {
-                        OutBuffer.buffer[i] = PendingCommands[0];
-                        PendingCommands.RemoveAt(0);
-                        ++i;
-                        OutBuffer.buffer[i] = PendingCommands[0];
+                        foreach(byte b in CommandBytes)
+                        {
+                            OutBuffer.buffer[position] = b;
+                            ++position;
+                        }
                         PendingCommands.RemoveAt(0);
                     }
-                    else // Regular 1-byte command
+                    else
                     {
-                        OutBuffer.buffer[i] = PendingCommands[0];
-                        PendingCommands.RemoveAt(0);
+                        position += CommandBytes.Count;
+                        break;
                     }
-                }
-                else
-                {
-                    break;
                 }
             }
 
@@ -426,11 +495,11 @@ namespace SolarChargerApp
         {
             if (PowerOutput1)
             {
-                PendingCommands.Add(0x30);
+                PendingCommands.Add(new UsbCommand(0x30));
             }
             else
             {
-                PendingCommands.Add(0x31);
+                PendingCommands.Add(new UsbCommand(0x31));
             }
         }
 
@@ -438,11 +507,11 @@ namespace SolarChargerApp
         {
             if (PowerOutput2)
             {
-                PendingCommands.Add(0x32);
+                PendingCommands.Add(new UsbCommand(0x32));
             }
             else
             {
-                PendingCommands.Add(0x33);
+                PendingCommands.Add(new UsbCommand(0x33));
             }
         }
 
@@ -450,11 +519,11 @@ namespace SolarChargerApp
         {
             if (PowerOutput3)
             {
-                PendingCommands.Add(0x34);
+                PendingCommands.Add(new UsbCommand(0x34));
             }
             else
             {
-                PendingCommands.Add(0x35);
+                PendingCommands.Add(new UsbCommand(0x35));
             }
         }
 
@@ -462,11 +531,11 @@ namespace SolarChargerApp
         {
             if (PowerOutput4)
             {
-                PendingCommands.Add(0x36);
+                PendingCommands.Add(new UsbCommand(0x36));
             }
             else
             {
-                PendingCommands.Add(0x37);
+                PendingCommands.Add(new UsbCommand(0x37));
             }
         }
 
@@ -474,11 +543,11 @@ namespace SolarChargerApp
         {
             if (PowerOutputUsb)
             {
-                PendingCommands.Add(0x38);
+                PendingCommands.Add(new UsbCommand(0x38));
             }
             else
             {
-                PendingCommands.Add(0x39);
+                PendingCommands.Add(new UsbCommand(0x39));
             }
         }
 
@@ -486,123 +555,130 @@ namespace SolarChargerApp
         {
             if (FanOutput)
             {
-                PendingCommands.Add(0x3A);
+                PendingCommands.Add(new UsbCommand(0x3A));
             }
             else
             {
-                PendingCommands.Add(0x3B);
+                PendingCommands.Add(new UsbCommand(0x3B));
             }
         }
 
         public void RequestTurnLeft()
         {
-            PendingCommands.Add(0x3C);
+            PendingCommands.Add(new UsbCommand(0x3C));
         }
 
         public void RequestTurnRight()
         {
-            PendingCommands.Add(0x3D);
+            PendingCommands.Add(new UsbCommand(0x3D));
         }
 
         public void RequestButtonPress()
         {
-            PendingCommands.Add(0x3E);
+            PendingCommands.Add(new UsbCommand(0x3E));
         }
 
-        public void SetYear(uint year)
+        public enum DateTimeElement: byte
         {
-            PendingCommands.Add(0x40);
-            PendingCommands.Add(UintToBcd(year));
+            Year = 0x40,
+            Month = 0x41,
+            Day = 0x42,
+            Hour = 0x43,
+            Minute = 0x44,
+            Second = 0x45,
+            EEPROM_WRITE_REQUEST = 0x3F
         }
 
-        public void SetMonth(uint month)
+        public void SetDateTime(DateTimeElement element, uint value)
         {
-            PendingCommands.Add(0x41);
-            PendingCommands.Add(UintToBcd(month));
-        }
-
-        public void SetDay(uint day)
-        {
-            PendingCommands.Add(0x42);
-            PendingCommands.Add(UintToBcd(day));
-        }
-
-        public void SetHour(uint hour)
-        {
-            PendingCommands.Add(0x43);
-            PendingCommands.Add(UintToBcd(hour));
-        }
-
-        public void SetMinute(uint minute)
-        {
-            PendingCommands.Add(0x44);
-            PendingCommands.Add(UintToBcd(minute));
-        }
-
-        public void SetSecond(uint second)
-        {
-            PendingCommands.Add(0x45);
-            PendingCommands.Add(UintToBcd(second));
-        }
-
-        public void RequestDatetimeWrite()
-        {
-            PendingCommands.Add(0x3F);
+            UsbCommand cmd;
+            if(element== DateTimeElement.EEPROM_WRITE_REQUEST)
+            {
+                cmd = new UsbCommand((byte)element);
+            }
+            else
+            {
+                cmd = new UsbCommand((byte)element, UintToBcd(value));
+            }
+            PendingCommands.Add(cmd);
         }
 
         public void EnableManualControl()
         {
-            PendingCommands.Add(0x46);
-            PendingCommands.Add(0x00);
+            PendingCommands.Add(new UsbCommand(0x46));
         }
 
         public void DisableManualControl()
         {
-            PendingCommands.Add(0x47);
-            PendingCommands.Add(0x00);
+            PendingCommands.Add(new UsbCommand(0x47));
         }
 
         public void RequestChargerOn()
         {
-            PendingCommands.Add(0x48);
-            PendingCommands.Add(0x00);
+            PendingCommands.Add(new UsbCommand(0x48));
         }
 
         public void RequestChargerOff()
         {
-            PendingCommands.Add(0x49);
-            PendingCommands.Add(0x00);
+            PendingCommands.Add(new UsbCommand(0x49));
         }
 
         public void RequestAsynchronousMode()
         {
-            PendingCommands.Add(0x4A);
-            PendingCommands.Add(0x00);
+            PendingCommands.Add(new UsbCommand(0x4A));
         }
 
         public void RequestSynchronousMode()
         {
-            PendingCommands.Add(0x4B);
-            PendingCommands.Add(0x00);
+            PendingCommands.Add(new UsbCommand(0x4B));
         }
 
         public void RequestDecreaseDutycycle()
         {
-            PendingCommands.Add(0x4C);
-            PendingCommands.Add(0x00);
+            PendingCommands.Add(new UsbCommand(0x4C));
         }
 
         public void RequestIncreaseDutycycle()
         {
-            PendingCommands.Add(0x4D);
-            PendingCommands.Add(0x00);
+            PendingCommands.Add(new UsbCommand(0x4D));
         }
-
 
         public void SetDutycycle(byte dutycycle)
         {
-            PendingCommands.Add(0x4E);
-            PendingCommands.Add(dutycycle);
+            UsbCommand cmd = new UsbCommand(0x4E, dutycycle);
+            PendingCommands.Add(cmd);
+        }
+
+        public enum CalibrationItem: byte
+        {
+            InputVoltageSlope = 0x60,
+            InputVoltageOffset = 0x61,
+            OutputVoltageSlope = 0x62,
+            OutputVoltageOffset = 0x63,
+            InputCurrentSlope = 0x64,
+            InputCurrentOffset = 0x65,
+            OutputCurrentSlope = 0x66,
+            OutputCurrentOffset = 0x67,
+            OnboardTemperatureSlope = 0x68,
+            OnboardTemperatureOffset = 0x69,
+            ExternalTemperature1Slope = 0x6A,
+            ExternalTemperature1Offset = 0x6B,
+            ExternalTemperature2Slope = 0x6C,
+            ExternalTemperature2Offset = 0x6D
+        }
+
+        //Calibrating slope
+        public void SetCalibration(CalibrationItem item, float value)
+        {
+            UsbCommand cmd = new UsbCommand((byte) item, value);
+            PendingCommands.Add(cmd);
+        }
+
+        //Calibrating offset
+        public void SetCalibration(CalibrationItem item, Int16 value)
+        {
+            UsbCommand cmd = new UsbCommand((byte) item, value);
+            PendingCommands.Add(cmd);
         }
 
     } // Communicator
