@@ -73,7 +73,7 @@ namespace SolarChargerApp
         public void RequestOut1Toggle()
         {
             WriteLog("Toggle Out1 button clicked", false);
-            communicator.RequestOut1Toggle();
+            communicator.RequestPowerOutputMode(Communicator.PowerOutput.PowerOutput1, Communicator.PowerOutputAction.Toggle);
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
@@ -84,7 +84,7 @@ namespace SolarChargerApp
         public void RequestOut2Toggle()
         {
             WriteLog("Toggle Out2 button clicked", false);
-            communicator.RequestOut2Toggle();
+            communicator.RequestPowerOutputMode(Communicator.PowerOutput.PowerOutput2, Communicator.PowerOutputAction.Toggle);
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
@@ -94,7 +94,7 @@ namespace SolarChargerApp
         public void RequestOut3Toggle()
         {
             WriteLog("Toggle Out3 button clicked", false);
-            communicator.RequestOut3Toggle();
+            communicator.RequestPowerOutputMode(Communicator.PowerOutput.PowerOutput3, Communicator.PowerOutputAction.Toggle);
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
@@ -104,7 +104,7 @@ namespace SolarChargerApp
         public void RequestOut4Toggle()
         {
             WriteLog("Toggle Out4 button clicked", false);
-            communicator.RequestOut4Toggle();
+            communicator.RequestPowerOutputMode(Communicator.PowerOutput.PowerOutput4, Communicator.PowerOutputAction.Toggle);
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
@@ -114,7 +114,10 @@ namespace SolarChargerApp
         public void RequestUsbToggle()
         {
             WriteLog("Toggle Usb button clicked", false);
-            communicator.RequestUsbToggle();
+            //Debug code
+            communicator.HidUtil.SelectDevice(new Device(0x04D8, 0xF08E));
+            WriteLog("Re-selected device Vid=0x04D8, Pid=0xF08E", false);
+            communicator.RequestPowerOutputMode(Communicator.PowerOutput.PowerOutputUsb, Communicator.PowerOutputAction.Toggle);
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
@@ -124,7 +127,7 @@ namespace SolarChargerApp
         public void RequestTurnLeft()
         {
             WriteLog("Turn left button clicked", false);
-            communicator.RequestTurnLeft();
+            communicator.RequestEncoder(Communicator.RotaryEncoder.TurnLeft);
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
@@ -134,7 +137,7 @@ namespace SolarChargerApp
         public void RequestTurnRight()
         {
             WriteLog("Turn right button clicked", false);
-            communicator.RequestTurnRight();
+            communicator.RequestEncoder(Communicator.RotaryEncoder.TurnRight);
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
@@ -144,7 +147,7 @@ namespace SolarChargerApp
         public void RequestButtonPress()
         {
             WriteLog("Press button clicked", false);
-            communicator.RequestButtonPress();
+            communicator.RequestEncoder(Communicator.RotaryEncoder.ButtonPress);
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
@@ -154,13 +157,13 @@ namespace SolarChargerApp
         public void UseSystemTime()
         {
             WriteLog("Date and time set to system time", false);
-            communicator.SetYear((uint)(DateTime.Now.Year - 2000));
-            communicator.SetMonth((uint)DateTime.Now.Month);
-            communicator.SetDay((uint)DateTime.Now.Day);
-            communicator.SetHour((uint)DateTime.Now.Hour);
-            communicator.SetMinute((uint)DateTime.Now.Minute);
-            communicator.SetSecond((uint)DateTime.Now.Second);
-            communicator.RequestDatetimeWrite();
+            communicator.SetDateTime(Communicator.DateTimeElement.Year, (uint) (DateTime.Now.Year - 2000));
+            communicator.SetDateTime(Communicator.DateTimeElement.Month, (uint) DateTime.Now.Month);
+            communicator.SetDateTime(Communicator.DateTimeElement.Day, (uint) DateTime.Now.Day);
+            communicator.SetDateTime(Communicator.DateTimeElement.Hour, (uint) DateTime.Now.Hour);
+            communicator.SetDateTime(Communicator.DateTimeElement.Minute, (uint) DateTime.Now.Minute);
+            communicator.SetDateTime(Communicator.DateTimeElement.Second, (uint) DateTime.Now.Second);
+            communicator.SetDateTime(Communicator.DateTimeElement.EEPROM_WRITE_REQUEST, 0x00);
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
@@ -172,12 +175,12 @@ namespace SolarChargerApp
             if (OnOffButtonTxt == "Turn charger on")
             {
                 WriteLog("Charger on button clicked", false);
-                communicator.RequestChargerOn();
+                communicator.RequestChargerOnOff(Communicator.ChargerOnOff.On);
             }
             else
             {
                 WriteLog("Charger off button clicked", false);
-                communicator.RequestChargerOff();
+                communicator.RequestChargerOnOff(Communicator.ChargerOnOff.Off);
             }
             if (PropertyChanged != null)
             {
@@ -378,14 +381,6 @@ namespace SolarChargerApp
                     PropertyChanged(this, new PropertyChangedEventArgs("BuckModeTxt"));
                     PropertyChanged(this, new PropertyChangedEventArgs("DutyCycleTxt"));
                     PropertyChanged(this, new PropertyChangedEventArgs("OnOffButtonTxt"));
-                    PropertyChanged(this, new PropertyChangedEventArgs("ConnectionStatusTxt"));
-                    PropertyChanged(this, new PropertyChangedEventArgs("UptimeTxt"));
-                    PropertyChanged(this, new PropertyChangedEventArgs("TxSuccessfulTxt"));
-                    PropertyChanged(this, new PropertyChangedEventArgs("TxFailedTxt"));
-                    PropertyChanged(this, new PropertyChangedEventArgs("RxSuccessfulTxt"));
-                    PropertyChanged(this, new PropertyChangedEventArgs("RxFailedTxt"));
-                    PropertyChanged(this, new PropertyChangedEventArgs("TxSpeedTxt"));
-                    PropertyChanged(this, new PropertyChangedEventArgs("RxSpeedTxt"));
                     PropertyChanged(this, new PropertyChangedEventArgs("UserInterfaceEnabled"));
                     PropertyChanged(this, new PropertyChangedEventArgs("InputVoltageBarColor"));
                     PropertyChanged(this, new PropertyChangedEventArgs("OutputVoltageBarColor"));
@@ -400,6 +395,16 @@ namespace SolarChargerApp
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("DisplayTxt"));
                 }
+                //Update these in any case
+                PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("ConnectionStatusTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("UptimeTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("TxSuccessfulTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("TxFailedTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("RxSuccessfulTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("RxFailedTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("TxSpeedTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("RxSpeedTxt"));   
             }
         }
 
@@ -958,12 +963,12 @@ namespace SolarChargerApp
                 if (_ManualControl)
                 {
                     WriteLog("Manual control enabled", false);
-                    communicator.EnableManualControl();
+                    communicator.RequestChargerControl(Communicator.ChargerControl.Remote);
                 }
                 else
                 {
                     WriteLog("Manual control disabled", false);
-                    communicator.DisableManualControl();
+                    communicator.RequestChargerControl(Communicator.ChargerControl.Local);
                 }
                 if (PropertyChanged != null)
                 {
@@ -984,12 +989,12 @@ namespace SolarChargerApp
                 if (_SynchronousMode)
                 {
                     WriteLog("Synchronous mode entered", false);
-                    communicator.RequestSynchronousMode();
+                    communicator.RequestChargerMode(Communicator.ChargerMode.SynchronousMode);
                 }
                 else
                 {
                     WriteLog("Asynchronous mode entered", false);
-                    communicator.RequestAsynchronousMode();
+                    communicator.RequestChargerMode(Communicator.ChargerMode.AsynchronousMode);
                 }
                 if (PropertyChanged != null)
                 {

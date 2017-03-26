@@ -136,8 +136,6 @@ namespace SolarChargerApp
             }
         }
 
-
-
         //Others
         private bool _NewStatusAvailable;
         private bool _NewDisplay1Available;
@@ -369,7 +367,7 @@ namespace SolarChargerApp
                 TxFailedCount = 0;
                 RxCount = 0;
                 RxFailedCount = 0;
-                PendingCommands = new List<UsbCommand();
+                PendingCommands = new List<UsbCommand>();
                 LastCommand = 0x81;
             }
         }
@@ -491,91 +489,105 @@ namespace SolarChargerApp
             return true;
         }
 
-        public void RequestOut1Toggle()
+        public enum PowerOutput: byte
         {
-            if (PowerOutput1)
+            PowerOutput1 = 0x30,
+            PowerOutput2 = 0x32,
+            PowerOutput3 = 0x34,
+            PowerOutput4 = 0x36,
+            PowerOutputUsb = 0x38
+        }
+
+        public enum PowerOutputAction: byte
+        {
+            Off = 0x00,
+            On = 0x01,
+            Toggle
+        }
+
+        public void RequestPowerOutputMode(PowerOutput output, PowerOutputAction action)
+        {
+            byte command = 0x00;
+            if (action == PowerOutputAction.Toggle)
             {
-                PendingCommands.Add(new UsbCommand(0x30));
+                switch(output)
+                {
+                    case PowerOutput.PowerOutput1:
+                        if(PowerOutput1)
+                            command = (byte)((byte)PowerOutput.PowerOutput1 | (byte)PowerOutputAction.Off);
+                        else
+                            command = (byte)((byte)PowerOutput.PowerOutput1 | (byte)PowerOutputAction.On);
+                        break;
+                    case PowerOutput.PowerOutput2:
+                        if (PowerOutput1)
+                            command = (byte)((byte)PowerOutput.PowerOutput2 | (byte)PowerOutputAction.Off);
+                        else
+                            command = (byte)((byte)PowerOutput.PowerOutput2 | (byte)PowerOutputAction.On);
+                        break;
+                    case PowerOutput.PowerOutput3:
+                        if (PowerOutput1)
+                            command = (byte)((byte)PowerOutput.PowerOutput3 | (byte)PowerOutputAction.Off);
+                        else
+                            command = (byte)((byte)PowerOutput.PowerOutput3 | (byte)PowerOutputAction.On);
+                        break;
+                    case PowerOutput.PowerOutput4:
+                        if (PowerOutput1)
+                            command = (byte)((byte)PowerOutput.PowerOutput4 | (byte)PowerOutputAction.Off);
+                        else
+                            command = (byte)((byte)PowerOutput.PowerOutput4| (byte)PowerOutputAction.On);
+                        break;
+                    case PowerOutput.PowerOutputUsb:
+                        if (PowerOutput1)
+                            command = (byte)((byte)PowerOutput.PowerOutputUsb | (byte)PowerOutputAction.Off);
+                        else
+                            command = (byte)((byte)PowerOutput.PowerOutputUsb | (byte)PowerOutputAction.On);
+                        break;
+                }
+                PendingCommands.Add(new UsbCommand(command));
             }
             else
             {
-                PendingCommands.Add(new UsbCommand(0x31));
+                command = (byte) ((byte)output | (byte)action);
+                PendingCommands.Add(new UsbCommand(command));
             }
         }
-
-        public void RequestOut2Toggle()
+        
+        public enum FanMode: byte
         {
-            if (PowerOutput2)
+            Off = 0x3A,
+            On = 0x3B,
+            Toggle
+        }
+
+        public void RequestFanMode(FanMode action)
+        {
+            if(action==FanMode.Toggle)
             {
-                PendingCommands.Add(new UsbCommand(0x32));
+                if (FanOutput)
+                {
+                    PendingCommands.Add(new UsbCommand((byte) FanMode.Off));
+                }
+                else
+                {
+                    PendingCommands.Add(new UsbCommand((byte) FanMode.On));
+                }
             }
             else
             {
-                PendingCommands.Add(new UsbCommand(0x33));
-            }
+                PendingCommands.Add(new UsbCommand((byte) action));
+            } 
         }
 
-        public void RequestOut3Toggle()
+        public enum RotaryEncoder: byte
         {
-            if (PowerOutput3)
-            {
-                PendingCommands.Add(new UsbCommand(0x34));
-            }
-            else
-            {
-                PendingCommands.Add(new UsbCommand(0x35));
-            }
+            TurnLeft = 0x3C,
+            TurnRight = 0x3D,
+            ButtonPress = 0x3E
         }
 
-        public void RequestOut4Toggle()
+        public void RequestEncoder(RotaryEncoder action)
         {
-            if (PowerOutput4)
-            {
-                PendingCommands.Add(new UsbCommand(0x36));
-            }
-            else
-            {
-                PendingCommands.Add(new UsbCommand(0x37));
-            }
-        }
-
-        public void RequestUsbToggle()
-        {
-            if (PowerOutputUsb)
-            {
-                PendingCommands.Add(new UsbCommand(0x38));
-            }
-            else
-            {
-                PendingCommands.Add(new UsbCommand(0x39));
-            }
-        }
-
-        public void RequestFanToggle()
-        {
-            if (FanOutput)
-            {
-                PendingCommands.Add(new UsbCommand(0x3A));
-            }
-            else
-            {
-                PendingCommands.Add(new UsbCommand(0x3B));
-            }
-        }
-
-        public void RequestTurnLeft()
-        {
-            PendingCommands.Add(new UsbCommand(0x3C));
-        }
-
-        public void RequestTurnRight()
-        {
-            PendingCommands.Add(new UsbCommand(0x3D));
-        }
-
-        public void RequestButtonPress()
-        {
-            PendingCommands.Add(new UsbCommand(0x3E));
+            PendingCommands.Add(new UsbCommand((byte) action));
         }
 
         public enum DateTimeElement: byte
@@ -603,34 +615,37 @@ namespace SolarChargerApp
             PendingCommands.Add(cmd);
         }
 
-        public void EnableManualControl()
+        public enum ChargerControl: byte
         {
-            PendingCommands.Add(new UsbCommand(0x46));
+            Remote = 0x46,
+            Local = 0x47
         }
 
-        public void DisableManualControl()
+        public void RequestChargerControl(ChargerControl control)
         {
-            PendingCommands.Add(new UsbCommand(0x47));
+            PendingCommands.Add(new UsbCommand((byte) control));
         }
 
-        public void RequestChargerOn()
+        public enum ChargerOnOff: byte
         {
-            PendingCommands.Add(new UsbCommand(0x48));
+            On = 0x48,
+            Off = 0x49
         }
 
-        public void RequestChargerOff()
+        public void RequestChargerOnOff(ChargerOnOff mode)
         {
-            PendingCommands.Add(new UsbCommand(0x49));
+            PendingCommands.Add(new UsbCommand((byte) mode));
         }
 
-        public void RequestAsynchronousMode()
+        public enum ChargerMode: byte
         {
-            PendingCommands.Add(new UsbCommand(0x4A));
+            AsynchronousMode = 0x4A,
+            SynchronousMode = 0x4B
         }
 
-        public void RequestSynchronousMode()
+        public void RequestChargerMode(ChargerMode mode)
         {
-            PendingCommands.Add(new UsbCommand(0x4B));
+            PendingCommands.Add(new UsbCommand((byte) mode));
         }
 
         public void RequestDecreaseDutycycle()
@@ -678,6 +693,24 @@ namespace SolarChargerApp
         public void SetCalibration(CalibrationItem item, Int16 value)
         {
             UsbCommand cmd = new UsbCommand((byte) item, value);
+            PendingCommands.Add(cmd);
+        }
+
+        public void SetRealTimeClockCalibration(byte calibration)
+        {
+            UsbCommand cmd = new UsbCommand(0x52, calibration);
+            PendingCommands.Add(cmd);
+        }
+
+        public enum DisplayProperty: byte
+        {
+            Timeout = 0x51,
+            Brightness = 0x50
+        }
+
+        public void SetDisplayProperty(DisplayProperty property, byte value)
+        {
+            UsbCommand cmd = new UsbCommand((byte)property, value);
             PendingCommands.Add(cmd);
         }
 

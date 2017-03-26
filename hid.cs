@@ -872,8 +872,6 @@ namespace hid
             }
         }
 
-
-        
         public void OpenDevice(String DevicePath)
         {
             uint ErrorStatusWrite;
