@@ -44,9 +44,11 @@
                 <TextBox Name="InputCurrent_TextBox"  Grid.Column="1" Grid.Row="0" Background="WhiteSmoke" Margin="10,5"
                         Text="{Binding InputCurrentTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}" />
                 <ProgressBar Name="InputVoltage_ProgressBar" Grid.Column="0" Grid.Row="1" Minimum="0" Maximum="20" Margin="10,5"
-                        Value="{Binding InputVoltage, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
+                        Value="{Binding InputVoltage, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                        Foreground="{Binding InputVoltageBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
                 <ProgressBar Name="InputCurrent_ProgressBar" Grid.Column="1" Grid.Row="1" Minimum="0" Maximum="5" Margin="10,5"
-                        Value="{Binding InputCurrent, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
+                        Value="{Binding InputCurrent, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                        Foreground="{Binding InputCurrentBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
             </Grid>
         </GroupBox>
 
@@ -65,9 +67,11 @@
                 <TextBox Name="OutputCurrent_TextBox"  Grid.Column="1" Grid.Row="0" Background="WhiteSmoke" Margin="10,5"
                         Text="{Binding OutputCurrentTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}" />
                 <ProgressBar Name="OutputVoltage_ProgressBar" Grid.Column="0" Grid.Row="1" Minimum="0" Maximum="20" Margin="10,5"
-                        Value="{Binding OutputVoltage, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
+                        Value="{Binding OutputVoltage, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                        Foreground="{Binding OutputVoltageBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
                 <ProgressBar Name="OutputCurrent_ProgressBar" Grid.Column="1" Grid.Row="1" Minimum="0" Maximum="5" Margin="10,5"
-                        Value="{Binding OutputCurrent, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
+                        Value="{Binding OutputCurrent, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                        Foreground="{Binding OutputCurrentBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
             </Grid>
         </GroupBox>
 
@@ -95,13 +99,17 @@
                         Text="{Binding EfficiencyTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}" />
                 
                 <ProgressBar Name="InputPower_ProgressBar" Grid.Column="0" Grid.Row="1" Minimum="0" Maximum="80" Margin="10,5"
-                        Value="{Binding InputPower, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
+                        Value="{Binding InputPower, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                        Foreground="{Binding InputPowerBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
                 <ProgressBar Name="OutputPower_ProgressBar" Grid.Column="1" Grid.Row="1" Minimum="0" Maximum="80" Margin="10,5"
-                        Value="{Binding OutputPower, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
-                <ProgressBar Name="Loss_ProgressBar" Grid.Column="2" Grid.Row="1" Minimum="0" Maximum="50" Margin="10,5"
-                        Value="{Binding Loss, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
+                        Value="{Binding OutputPower, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                        Foreground="{Binding OutputPowerBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
+                <ProgressBar Name="Loss_ProgressBar" Grid.Column="2" Grid.Row="1" Minimum="0" Maximum="10" Margin="10,5"
+                        Value="{Binding Loss, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                        Foreground="{Binding LossBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
                 <ProgressBar Name="Efficicy_ProgressBar" Grid.Column="3" Grid.Row="1" Minimum="0" Maximum="1" Margin="10,5"
-                        Value="{Binding Efficiency, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
+                        Value="{Binding Efficiency, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                        Foreground="{Binding EfficiencyBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
             </Grid>
         </GroupBox>
         
@@ -258,11 +266,13 @@
                     <RowDefinition Height="3*" />
                 </Grid.RowDefinitions>
                 <Button Name="TurnLeft_Button" Grid.Column="0" Grid.Row="0" Margin="10,10,10,0" Content="&lt;-"
-                    Command="{Binding TurnLeftClick, Source={StaticResource CommunicatorVM}}"/>
+                    Command="{Binding TurnLeftClick, Source={StaticResource CommunicatorVM}}"
+                    IsEnabled="{Binding UserInterfaceEnabled, Source={StaticResource CommunicatorVM}}"/>
                 <Button Name="PushButton_Button" Grid.Column="1" Grid.Row="0" Margin="10,10,10,0" Content="Press"
                     Command="{Binding ButtonPressClick, Source={StaticResource CommunicatorVM}}"/>
                 <Button Name="TurnRight_Button" Grid.Column="2" Grid.Row="0" Margin="10,10,10,0" Content="-&gt;"
-                    Command="{Binding TurnRightClick, Source={StaticResource CommunicatorVM}}"/>
+                    Command="{Binding TurnRightClick, Source={StaticResource CommunicatorVM}}"
+                    IsEnabled="{Binding UserInterfaceEnabled, Source={StaticResource CommunicatorVM}}"/>
                 <TextBox  Name="Display_TextBox" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3"
                     Background="SteelBlue" Foreground="White" FontFamily="Global Monospace" Margin="10,10"
                     FontSize="17" FontWeight="Bold" IsReadOnly="True" MaxLines="4" MinLines="4" MaxLength="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 

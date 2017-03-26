@@ -386,6 +386,15 @@ namespace SolarChargerApp
                     PropertyChanged(this, new PropertyChangedEventArgs("RxFailedTxt"));
                     PropertyChanged(this, new PropertyChangedEventArgs("TxSpeedTxt"));
                     PropertyChanged(this, new PropertyChangedEventArgs("RxSpeedTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("UserInterfaceEnabled"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("InputVoltageBarColor"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("OutputVoltageBarColor"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("InputCurrentBarColor"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("OutputCurrentBarColor"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("InputPowerBarColor"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("OutputPowerBarColor"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("LossBarColor"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("EfficiencyBarColor"));
                 }
                 if (communicator.NewDisplayAvailable)
                 {
@@ -698,7 +707,7 @@ namespace SolarChargerApp
             }
         }
 
-        public double InutPowerp
+        public double InputPower
         {
             get
             {
@@ -742,7 +751,7 @@ namespace SolarChargerApp
         {
             get
             {
-                return string.Format("Loss: {0:0.000}W", (float)(((communicator.InputVoltage * communicator.InputCurrent) - (communicator.OutputVoltage * communicator.OutputCurrent)) / 1000000.0));
+                return string.Format("Loss: {0:0.000}W", communicator.Loss);
             }
         }
 
@@ -901,7 +910,10 @@ namespace SolarChargerApp
         {
             get
             {
-                return string.Format("Dutycycle: {0} ({1:0.0}%)", communicator.BuckDutyCycle.ToString(), (double)communicator.BuckDutyCycle / 2.55);
+                if (communicator.BuckMode == 0x00 || communicator.BuckMode == 0x80)
+                    return "Dutycycle: -";
+                else
+                    return string.Format("Dutycycle: {0} ({1:0.0}%)", communicator.BuckDutyCycle.ToString(), (double)communicator.BuckDutyCycle / 2.55);
             }
         }
 
@@ -1004,6 +1016,142 @@ namespace SolarChargerApp
                 }
             }
         }
+
+        public bool UserInterfaceEnabled
+        {
+            get
+            {
+                return communicator.DisplayStatus>1;
+            }
+        }
+
+        public string InputVoltageBarColor
+        {
+            get
+            {
+                if (communicator.InputVoltage < 17.0)
+                    return "OliveDrab";
+                else if (communicator.InputVoltage < 19.0)
+                    return "DarkOrange";
+                else if (communicator.InputVoltage < 21.0)
+                    return "OrangeRed";
+                else
+                    return "Red";
+
+            }
+        }
+
+        public string OutputVoltageBarColor
+        {
+            get
+            {
+                if (communicator.OutputVoltage < 11.0)
+                    return "Red";
+                else if (communicator.OutputVoltage < 11.5)
+                    return "OrangeRed";
+                else if (communicator.OutputVoltage < 12.0)
+                    return "DarkOrange";
+                else if (communicator.OutputVoltage < 13.3)
+                    return "OliveDrab";
+                else if (communicator.OutputVoltage < 13.5)
+                    return "DarkOrange";
+                else if (communicator.OutputVoltage < 14.0)
+                    return "OrangeRed";
+                else
+                    return "Red";
+            }
+        }
+
+        public string InputCurrentBarColor
+        {
+            get
+            {
+                if (communicator.InputCurrent < 4.0)
+                    return "OliveDrab";
+                else if (communicator.InputCurrent < 5.0)
+                    return "DarkOrange";
+                else if (communicator.InputCurrent < 6.0)
+                    return "OrangeRed";
+                else
+                    return "Red";
+            }
+        }
+
+        public string OutputCurrentBarColor
+        {
+            get
+            {
+                if (communicator.OutputCurrent < 5.0)
+                    return "OliveDrab";
+                else if (communicator.OutputCurrent < 6.0)
+                    return "DarkOrange";
+                else if (communicator.OutputCurrent < 7.0)
+                    return "OrangeRed";
+                else
+                    return "Red";
+            }
+        }
+
+        public string InputPowerBarColor
+        {
+            get
+            {
+                if (communicator.InputPower < 60.0)
+                    return "OliveDrab";
+                else if (communicator.InputPower < 75.0)
+                    return "DarkOrange";
+                else if (communicator.InputPower < 80.0)
+                    return "OrangeRed";
+                else
+                    return "Red";
+            }
+        }
+
+        public string OutputPowerBarColor
+        {
+            get
+            {
+                if (communicator.OutputPower < 60.0)
+                    return "OliveDrab";
+                else if (communicator.OutputPower < 75.0)
+                    return "DarkOrange";
+                else if (communicator.OutputPower < 80.0)
+                    return "OrangeRed";
+                else
+                    return "Red";
+            }
+        }
+
+        public string LossBarColor
+        {
+            get
+            {
+                if (communicator.Loss < 1.5)
+                    return "OliveDrab";
+                else if (communicator.Loss < 2.5)
+                    return "DarkOrange";
+                else if (communicator.Loss < 4.0)
+                    return "OrangeRed";
+                else
+                    return "Red";
+            }
+        }
+
+        public string EfficiencyBarColor
+        {
+            get
+            {
+                if (communicator.Efficiency > 0.97)
+                    return "OliveDrab";
+                else if (communicator.Efficiency < 96.0)
+                    return "DarkOrange";
+                else if (communicator.Efficiency < 95)
+                    return "OrangeRed";
+                else
+                    return "Red";
+            }
+        }
+
 
     }
 
