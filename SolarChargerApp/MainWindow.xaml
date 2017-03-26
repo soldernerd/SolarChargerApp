@@ -10,6 +10,7 @@
     <Window.Resources>
         <local:CommunicatorViewModel x:Key="CommunicatorVM"/>
     </Window.Resources>
+    
 
     <ScrollViewer Name="MainWindowScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
 

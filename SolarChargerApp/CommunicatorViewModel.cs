@@ -111,6 +111,7 @@ namespace SolarChargerApp
             }
         }
 
+
         public void RequestUsbToggle()
         {
             WriteLog("Toggle Usb button clicked", false);

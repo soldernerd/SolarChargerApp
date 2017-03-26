@@ -221,6 +221,7 @@ namespace SolarChargerApp
             }
         }
 
+
         //Function to parse packet received over USB
         private void ParseStatusData(ref UsbBuffer InBuffer)
         {
