@@ -756,7 +756,6 @@ namespace hid
                 //Do not try to use the read/write handles unless the USB device is attached and ready
                 if (ConnectionStatus == UsbConnectionStatus.Connected)
                 {
-
                     // Raise SendPacket event if there are any subscribers
                     if (RaiseSendPacketEvent != null)
                     {
@@ -765,7 +764,7 @@ namespace hid
                     }
 
                     //Send packet if the application requested so
-                    if(OutBuffer.RequestTransfer)
+                    if (OutBuffer.RequestTransfer)
                     {
                         try
                         {
@@ -816,8 +815,6 @@ namespace hid
                             RaisePacketReceivedEvent(this, InBuffer);
                         }
                     }
-
-                    
                 } // end of: if(AttachedState == true)
                 else
                 {

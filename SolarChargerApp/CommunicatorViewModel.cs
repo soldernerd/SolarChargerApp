@@ -40,15 +40,13 @@ namespace SolarChargerApp
             communicator.HidUtil.RaiseDeviceRemovedEvent += DeviceRemovedEventHandler;
             communicator.HidUtil.RaiseConnectionStatusChangedEvent += ConnectionStatusChangedHandler;
 
-
-
-            WriteLog("Program started", true);
-
             //Configure and start timer
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(50);
             timer.Tick += TimerTickHandler;
             timer.Start();
+
+            WriteLog("Program started", true);
         }
 
         /*
@@ -115,9 +113,6 @@ namespace SolarChargerApp
         public void RequestUsbToggle()
         {
             WriteLog("Toggle Usb button clicked", false);
-            //Debug code
-            communicator.HidUtil.SelectDevice(new Device(0x04D8, 0xF08E));
-            WriteLog("Re-selected device Vid=0x04D8, Pid=0xF08E", false);
             communicator.RequestPowerOutputMode(Communicator.PowerOutput.PowerOutputUsb, Communicator.PowerOutputAction.Toggle);
             if (PropertyChanged != null)
             {
@@ -395,7 +390,8 @@ namespace SolarChargerApp
                 if (communicator.NewDisplayAvailable)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("DisplayTxt"));
-                }
+                }              
+
                 //Update these in any case
                 PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
                 PropertyChanged(this, new PropertyChangedEventArgs("ConnectionStatusTxt"));
@@ -455,7 +451,6 @@ namespace SolarChargerApp
                 PropertyChanged(this, new PropertyChangedEventArgs("AdcValue"));
             }
         }
-
 
         public string DeviceListTxt
         {

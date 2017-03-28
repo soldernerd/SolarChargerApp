@@ -1,14 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Runtime.InteropServices;
+using System.Management;
+using System.IO;
+using System.Windows.Input;
+using System.ComponentModel;
+using System.Windows.Threading;
 using hid;
-
-
 
 
 namespace SolarChargerApp
 {
-
-
     /*
      *  The Model 
      */
@@ -116,12 +123,13 @@ namespace SolarChargerApp
                     case 0x60:
                         return this.GetByteList(5);
                     default:
-                        return this.GetByteList((byte) (this.data.Count + 1));
+                        return this.GetByteList(this.data.Count + 1);
                 }
             }
 
-            public List<byte> GetByteList(byte length)
+            public List<byte> GetByteList(int length)
             {
+                
                 List<byte> ByteList = new List<byte>();
                 ByteList.Add(command);
                 foreach(byte b in data)
@@ -133,7 +141,10 @@ namespace SolarChargerApp
                     ByteList.Add(0x00);
                 }
                 return ByteList;
+            
             }
+
+
         }
 
         //Others
@@ -157,8 +168,7 @@ namespace SolarChargerApp
             _NewDisplay2Available = false;
 
             // Obtain and initialize an instance of HidUtility
-            HidUtil = new HidUtility();
-            HidUtil.SelectDevice(new Device(_Vid, _Pid));
+            HidUtil = new HidUtility();  
 
             // Subscribe to HidUtility events
             HidUtil.RaiseConnectionStatusChangedEvent += ConnectionStatusChangedHandler;
@@ -166,6 +176,9 @@ namespace SolarChargerApp
             HidUtil.RaisePacketSentEvent += PacketSentHandler;
             HidUtil.RaiseReceivePacketEvent += ReceivePacketHandler;
             HidUtil.RaisePacketReceivedEvent += PacketReceivedHandler;
+
+            //Set the device to look for / connect with
+            HidUtil.SelectDevice(new Device(_Vid, _Pid));
         }
 
         //Convert binary coded decimal byte to integer
@@ -376,7 +389,7 @@ namespace SolarChargerApp
         // HidUtility asks if a packet should be sent to the device
         // Prepare the buffer and request a transfer
         public void SendPacketHandler(object sender, UsbBuffer OutBuffer)
-        {
+        { 
             // Fill entire buffer with 0xFF
             OutBuffer.clear();
 
@@ -405,26 +418,25 @@ namespace SolarChargerApp
             };
 
             int position = 2;
-            while(position<=64)
+            
+            while ((position<=64) && (PendingCommands.Count>0))
             {
-                while(PendingCommands.Count > 0)
+                List<byte> CommandBytes = PendingCommands[0].GetByteList();
+
+                //Check if entire command fits into current buffer
+                if ((64-position) >= CommandBytes.Count)
                 {
-                    List<byte> CommandBytes = PendingCommands[0].GetByteList();
-                    //Check if entire command fits into current buffer
-                    if((64-position) <= CommandBytes.Count)
+                    foreach (byte b in CommandBytes)
                     {
-                        foreach(byte b in CommandBytes)
-                        {
-                            OutBuffer.buffer[position] = b;
-                            ++position;
-                        }
-                        PendingCommands.RemoveAt(0);
+                        OutBuffer.buffer[position] = b;
+                        ++position;
                     }
-                    else
-                    {
-                        position += CommandBytes.Count;
-                        break;
-                    }
+                    PendingCommands.RemoveAt(0);
+                }
+                else
+                {
+                    position += CommandBytes.Count;
+                    break;
                 }
             }
 
@@ -520,25 +532,25 @@ namespace SolarChargerApp
                             command = (byte)((byte)PowerOutput.PowerOutput1 | (byte)PowerOutputAction.On);
                         break;
                     case PowerOutput.PowerOutput2:
-                        if (PowerOutput1)
+                        if (PowerOutput2)
                             command = (byte)((byte)PowerOutput.PowerOutput2 | (byte)PowerOutputAction.Off);
                         else
                             command = (byte)((byte)PowerOutput.PowerOutput2 | (byte)PowerOutputAction.On);
                         break;
                     case PowerOutput.PowerOutput3:
-                        if (PowerOutput1)
+                        if (PowerOutput3)
                             command = (byte)((byte)PowerOutput.PowerOutput3 | (byte)PowerOutputAction.Off);
                         else
                             command = (byte)((byte)PowerOutput.PowerOutput3 | (byte)PowerOutputAction.On);
                         break;
                     case PowerOutput.PowerOutput4:
-                        if (PowerOutput1)
+                        if (PowerOutput4)
                             command = (byte)((byte)PowerOutput.PowerOutput4 | (byte)PowerOutputAction.Off);
                         else
                             command = (byte)((byte)PowerOutput.PowerOutput4| (byte)PowerOutputAction.On);
                         break;
                     case PowerOutput.PowerOutputUsb:
-                        if (PowerOutput1)
+                        if (PowerOutputUsb)
                             command = (byte)((byte)PowerOutput.PowerOutputUsb | (byte)PowerOutputAction.Off);
                         else
                             command = (byte)((byte)PowerOutput.PowerOutputUsb | (byte)PowerOutputAction.On);

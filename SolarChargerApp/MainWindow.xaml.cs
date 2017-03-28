@@ -64,7 +64,90 @@ namespace SolarChargerApp
         //Scroll to bottom when text is changed
         public void ActivityLogTextChangedHandler(object sender, EventArgs e)
         {
-            ActivityLogScrollViewer.ScrollToBottom();
+            ActivityLogging_TextBox.ScrollToEnd();
+            //ActivityLogScrollViewer.ScrollToBottom();
         }
+
+        private void menu_about(object sender, EventArgs e)
+        {
+            MessageBox.Show("Lukas Fässler, 2017\nlfaessler@gmx.net\n\nVisit soldernerd.com for more information", "About Solar Charger App");
+        }
+
+        /*
+        private void menu_view_connection(object sender, EventArgs e)
+        {
+            if (gb_connection.Visibility == Visibility.Visible)
+            {
+                gb_connection.Visibility = Visibility.Collapsed;
+                this.Height -= gb_connection.Height;
+            }
+            else
+            {
+                gb_connection.Visibility = Visibility.Visible;
+                this.Height += gb_connection.Height;
+            }
+        }
+
+        private void menu_view_control(object sender, EventArgs e)
+        {
+            if (gb_control.Visibility == Visibility.Visible)
+            {
+                gb_control.Visibility = Visibility.Collapsed;
+                this.Height -= gb_control.Height;
+            }
+            else
+            {
+                gb_control.Visibility = Visibility.Visible;
+                this.Height += gb_control.Height;
+            }
+        }
+
+        private void menu_view_logging(object sender, EventArgs e)
+        {
+            if (gb_logging.Visibility == Visibility.Visible)
+            {
+                gb_logging.Visibility = Visibility.Collapsed;
+                this.Height -= gb_logging.Height;
+            }
+            else
+            {
+                gb_logging.Visibility = Visibility.Visible;
+                this.Height += gb_logging.Height;
+            }
+        }
+        */
+
+        private void menu_view_debugging(object sender, EventArgs e)
+        {
+            if (ActivityLogging_GroupBox.Visibility == Visibility.Visible)
+            {
+                ActivityLogging_GroupBox.Visibility = Visibility.Collapsed;
+                this.ActivityLog_Row.Height = new GridLength(0);
+                this.Height -= 150;
+            }
+            else
+            {
+                ActivityLogging_GroupBox.Visibility = Visibility.Visible;
+                this.ActivityLog_Row.Height = new GridLength(150);
+                this.Height += 150;
+            }
+        }
+
+        private void menu_view_connection(object sender, EventArgs e)
+        {
+            if (Communication_GroupBox.Visibility == Visibility.Visible)
+            {
+                Communication_GroupBox.Visibility = Visibility.Collapsed;
+                this.Connection_Row.Height = new GridLength(0);
+                this.Height -= 150;
+            }
+            else
+            {
+                Communication_GroupBox.Visibility = Visibility.Visible;
+                this.Connection_Row.Height = new GridLength(150);
+                this.Height += 150;
+            }
+        }
+
     }
 }

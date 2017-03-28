@@ -5,345 +5,358 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SolarChargerApp"
         mc:Ignorable="d"
-        Title="Soldernerd Solar Charger App" Height="700" Width="630" MinWidth="630" MinHeight="700">
+        Title="Soldernerd Solar Charger App" Height="900" Width="610" MinWidth="610" MinHeight="200">
 
     <Window.Resources>
         <local:CommunicatorViewModel x:Key="CommunicatorVM"/>
     </Window.Resources>
-    
 
-    <ScrollViewer Name="MainWindowScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+    <Grid Width="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="150" />
+            <ColumnDefinition Width="150" />
+            <ColumnDefinition Width="150" />
+            <ColumnDefinition Width="150" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20" />
+            <RowDefinition Height="100" />
+            <RowDefinition Height="100" />
+            <RowDefinition Height="150" />
+            <RowDefinition Height="200" />
+            <RowDefinition Height="150" Name="ActivityLog_Row"/>
+            <RowDefinition Height="150"  Name="Connection_Row"/>
+        </Grid.RowDefinitions>
 
-        <Grid Width="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="150" />
-                <ColumnDefinition Width="150" />
-                <ColumnDefinition Width="150" />
-                <ColumnDefinition Width="150" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition MinHeight="100" />
-                <RowDefinition MinHeight="100" />
-                <RowDefinition MinHeight="150" />
-                <RowDefinition MinHeight="200" />
-                <RowDefinition MinHeight="150" />
-                <RowDefinition MinHeight="150" />
-            </Grid.RowDefinitions>
-
-            <!-- Row 0 , input and output-->
-
-            <GroupBox Header="Input" Name="Input_GroupBox" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="10,10,10,10">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="1*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                    </Grid.RowDefinitions>
-                    <TextBox Name="InputVoltage_TextBox"  Grid.Column="0" Grid.Row="0" Background="WhiteSmoke" Margin="10,5"
-                        Text="{Binding InputVoltageTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}" />
-                    <TextBox Name="InputCurrent_TextBox"  Grid.Column="1" Grid.Row="0" Background="WhiteSmoke" Margin="10,5"
-                        Text="{Binding InputCurrentTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}" />
-                    <ProgressBar Name="InputVoltage_ProgressBar" Grid.Column="0" Grid.Row="1" Minimum="0" Maximum="20" Margin="10,5"
-                        Value="{Binding InputVoltage, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
-                        Foreground="{Binding InputVoltageBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
-                    <ProgressBar Name="InputCurrent_ProgressBar" Grid.Column="1" Grid.Row="1" Minimum="0" Maximum="5" Margin="10,5"
-                        Value="{Binding InputCurrent, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
-                        Foreground="{Binding InputCurrentBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
-                </Grid>
-            </GroupBox>
-
-            <GroupBox Header="Output" Name="Output_GroupBox" Grid.Column="2" Grid.Row="0" Grid.ColumnSpan="2" Margin="10,10,10,10">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="1*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                    </Grid.RowDefinitions>
-                    <TextBox Name="OutputVoltage_TextBox"  Grid.Column="0" Grid.Row="0" Background="WhiteSmoke" Margin="10,5"
-                        Text="{Binding OutputVoltageTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}" />
-                    <TextBox Name="OutputCurrent_TextBox"  Grid.Column="1" Grid.Row="0" Background="WhiteSmoke" Margin="10,5"
-                        Text="{Binding OutputCurrentTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}" />
-                    <ProgressBar Name="OutputVoltage_ProgressBar" Grid.Column="0" Grid.Row="1" Minimum="0" Maximum="20" Margin="10,5"
-                        Value="{Binding OutputVoltage, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
-                        Foreground="{Binding OutputVoltageBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
-                    <ProgressBar Name="OutputCurrent_ProgressBar" Grid.Column="1" Grid.Row="1" Minimum="0" Maximum="5" Margin="10,5"
-                        Value="{Binding OutputCurrent, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
-                        Foreground="{Binding OutputCurrentBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
-                </Grid>
-            </GroupBox>
-
-
-            <!-- Row 1, Efficiency -->
-            <GroupBox Header="Efficiency" Name="Efficiency_GroupBox" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4" Margin="10,10,10,10">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="1*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                    </Grid.RowDefinitions>
-                    <TextBox Name="InputPower_TextBox"  Grid.Column="0" Grid.Row="0" Background="WhiteSmoke" Margin="10,5"
-                        Text="{Binding InputPowerTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}" />
-                    <TextBox Name="OutputPower_TextBox"  Grid.Column="1" Grid.Row="0" Background="WhiteSmoke" Margin="10,5"
-                        Text="{Binding OutputPowerTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}" />
-                    <TextBox Name="Loss_TextBox"  Grid.Column="2" Grid.Row="0" Background="WhiteSmoke" Margin="10,5"
-                        Text="{Binding LossTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}" />
-                    <TextBox Name="Efficiency_TextBox"  Grid.Column="3" Grid.Row="0" Background="WhiteSmoke" Margin="10,5"
-                        Text="{Binding EfficiencyTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}" />
-
-                    <ProgressBar Name="InputPower_ProgressBar" Grid.Column="0" Grid.Row="1" Minimum="0" Maximum="80" Margin="10,5"
-                        Value="{Binding InputPower, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
-                        Foreground="{Binding InputPowerBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
-                    <ProgressBar Name="OutputPower_ProgressBar" Grid.Column="1" Grid.Row="1" Minimum="0" Maximum="80" Margin="10,5"
-                        Value="{Binding OutputPower, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
-                        Foreground="{Binding OutputPowerBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
-                    <ProgressBar Name="Loss_ProgressBar" Grid.Column="2" Grid.Row="1" Minimum="0" Maximum="10" Margin="10,5"
-                        Value="{Binding Loss, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
-                        Foreground="{Binding LossBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
-                    <ProgressBar Name="Efficicy_ProgressBar" Grid.Column="3" Grid.Row="1" Minimum="0" Maximum="1" Margin="10,5"
-                        Value="{Binding Efficiency, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
-                        Foreground="{Binding EfficiencyBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
-                </Grid>
-            </GroupBox>
-
-            <!-- Row 2, power outputs, usb charging, temperature  -->
-            <GroupBox Header="Power Outputs" Name="PowerOut_GroupBox" Grid.Column="0" Grid.Row="2" Margin="10,10,10,10">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*" />
-                        <ColumnDefinition Width="1*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                    </Grid.RowDefinitions>
-                    <TextBlock Name="Output1_TextBlock" Grid.Column="0" Grid.Row="0" Margin="10,5" 
-                    Text="{Binding Output1Txt, Source={StaticResource CommunicatorVM}}"/>
-                    <Button Name="Out1_Button" Grid.Column="1" Grid.Row="0"  Grid.ColumnSpan="1" Margin="2,2" Content="1"
-                    Command="{Binding Out1ToggleClick, Source={StaticResource CommunicatorVM}}"/>
-
-                    <TextBlock Name="Output2_TextBlock" Grid.Column="0" Grid.Row="1" Margin="10,5" 
-                    Text="{Binding Output2Txt, Source={StaticResource CommunicatorVM}}"/>
-                    <Button Name="Out2_Button" Grid.Column="1" Grid.Row="1"  Grid.ColumnSpan="1" Margin="2,2" Content="2"
-                    Command="{Binding Out2ToggleClick, Source={StaticResource CommunicatorVM}}"/>
-
-                    <TextBlock Name="Output3_TextBlock" Grid.Column="0" Grid.Row="2" Margin="10,5" 
-                    Text="{Binding Output3Txt, Source={StaticResource CommunicatorVM}}"/>
-                    <Button Name="Out3_Button" Grid.Column="1" Grid.Row="2"  Grid.ColumnSpan="1" Margin="2,2" Content="3"
-                    Command="{Binding Out3ToggleClick, Source={StaticResource CommunicatorVM}}"/>
-
-                    <TextBlock Name="Output4_TextBlock" Grid.Column="0" Grid.Row="3" Margin="10,5" 
-                    Text="{Binding Output4Txt, Source={StaticResource CommunicatorVM}}"/>
-                    <Button Name="Out4_Button" Grid.Column="1" Grid.Row="3"  Grid.ColumnSpan="1" Margin="2,2" Content="4"
-                    Command="{Binding Out4ToggleClick, Source={StaticResource CommunicatorVM}}"/>
-                </Grid>
-            </GroupBox>
-
-            <GroupBox Header="USB Charging" Name="UsbCharging_GroupBox" Grid.Column="1" Grid.Row="2" Margin="10,10,10,10">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                    </Grid.RowDefinitions>
-                    <TextBlock Name="UsbCharging_TextBlock" Grid.Column="0" Grid.Row="0" Margin="10,5" 
-                    Text="{Binding UsbChargingTxt, Source={StaticResource CommunicatorVM}}"/>
-                    <Button Name="Usb_Button" Grid.Column="0" Grid.Row="1"  Grid.ColumnSpan="1" Margin="2,2" Content="Toggle USB"
-                    Command="{Binding UsbToggleClick, Source={StaticResource CommunicatorVM}}"/>
-                </Grid>
-            </GroupBox>
-
-            <GroupBox Header="Temperature" Name="Temperature_GroupBox" Grid.Column="2" Grid.Row="2" Margin="10,10,10,10">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                    </Grid.RowDefinitions>
-                    <TextBlock Name="TemperatureOnboard_TextBlock" Grid.Column="0" Grid.Row="0" Margin="10,5" 
-                    Text="{Binding TemperatureOnboardTxt, Source={StaticResource CommunicatorVM}}"/>
-                    <TextBlock Name="TemperatureExternal1_TextBlock" Grid.Column="0" Grid.Row="1" Margin="10,5" 
-                    Text="{Binding TemperatureExternal1Txt, Source={StaticResource CommunicatorVM}}"/>
-                    <TextBlock Name="TemperatureExternal2_TextBlock" Grid.Column="0" Grid.Row="2" Margin="10,5" 
-                    Text="{Binding TemperatureExternal2Txt, Source={StaticResource CommunicatorVM}}"/>
-                    <TextBlock Name="Fan_TextBlock" Grid.Column="0" Grid.Row="3" Margin="10,5" 
-                    Text="{Binding FanTxt, Source={StaticResource CommunicatorVM}}"/>
-                </Grid>
-            </GroupBox>
-
-            <GroupBox Header="Date and Time" Name="DateTime_GroupBox" Grid.Column="3" Grid.Row="2" Margin="10,10,10,10">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                    </Grid.RowDefinitions>
-                    <TextBlock Name="Date_TextBlock" Grid.Row="0" Grid.Column="0" Margin="10,5" 
-                    Text="{Binding DateTxt, Source={StaticResource CommunicatorVM}}"/>
-                    <TextBlock Name="Time_TextBlock" Grid.Row="1" Grid.Column="0"  Margin="10,5" 
-                    Text="{Binding TimeTxt, Source={StaticResource CommunicatorVM}}"/>
-                    <Button Name="SystemTime_Button" Grid.Row="2" Grid.Column="0" Margin="2,2"
-                    Content="Use system time"
-                    Command="{Binding UseSystemTimeClick, Source={StaticResource CommunicatorVM}}"/>
-                </Grid>
-            </GroupBox>
-
-            <!-- Row 3 , charger and display-->
-
-            <GroupBox Header="Charger Details" Name="ChargerDetails_GroupBox" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Margin="10,10,10,10">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="1*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                    </Grid.RowDefinitions>
-                    <TextBlock Name="BuckMode_TextBlock" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" Margin="10,5" 
-                    Text="{Binding BuckModeTxt, Source={StaticResource CommunicatorVM}}"/>
-                    <TextBlock Name="DutyCycle_TextBlock" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Margin="10,5" 
-                    Text="{Binding DutyCycleTxt, Source={StaticResource CommunicatorVM}}"/>
-                    <CheckBox x:Name="Manual_CheckBox" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
-                    Content="Manual Control" HorizontalAlignment="Left" Margin="10,10"
-                    IsChecked="{Binding ManualControl, Source={StaticResource CommunicatorVM}}"/>
-
-                    <CheckBox x:Name="SynchronousMode_CheckBox" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
-                    Content="Synchronous Mode" HorizontalAlignment="Left" Margin="10,10"
-                    IsChecked="{Binding SynchronousMode, Source={StaticResource CommunicatorVM}}"/>
-                    <Button Name="ChargerOnOff_Button" Grid.Row="3" Grid.Column="2"  Grid.ColumnSpan="2"
-                    Margin="10,5" 
-                    Content="{Binding OnOffButtonTxt, Source={StaticResource CommunicatorVM}}"
-                    Command="{Binding ChargerOnOffClick, Source={StaticResource CommunicatorVM}}"/>
-
-                    <TextBox Name="DutyCycleInput_TextBox" Grid.Row="4" Grid.Column="0"
-                        Background="WhiteSmoke" Margin="10,5"
-                        Text="{Binding DutyCycleInputTxt, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Source={StaticResource CommunicatorVM}}" />
-                    <Button Name="SetDutyCycle_Button" Grid.Row="4" Grid.Column="1" Margin="10,5" Content="Set"
-                    Command="{Binding SetDutycycleClick, Source={StaticResource CommunicatorVM}}"/>
-                    <Button Name="DecreaseDutyCycle_Button" Grid.Row="4" Grid.Column="2" Margin="10,5" Content="-"
-                    Command="{Binding DecreaseDutycycleClick, Source={StaticResource CommunicatorVM}}"/>
-                    <Button Name="IncreaseDutyCycle_Button" Grid.Row="4" Grid.Column="3" Margin="10,5" Content="+"
-                    Command="{Binding IncreaseDutycycleClick, Source={StaticResource CommunicatorVM}}"/>
-                </Grid>
-            </GroupBox>
-
-            <GroupBox Header="User Interface" Name="UserInterface_GroupBox" Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2" Margin="10,10,10,10">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="1*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="3*" />
-                    </Grid.RowDefinitions>
-                    <Button Name="TurnLeft_Button" Grid.Column="0" Grid.Row="0" Margin="10,10,10,0" Content="&lt;-"
-                    Command="{Binding TurnLeftClick, Source={StaticResource CommunicatorVM}}"
-                    IsEnabled="{Binding UserInterfaceEnabled, Source={StaticResource CommunicatorVM}}"/>
-                    <Button Name="PushButton_Button" Grid.Column="1" Grid.Row="0" Margin="10,10,10,0" Content="Press"
-                    Command="{Binding ButtonPressClick, Source={StaticResource CommunicatorVM}}"/>
-                    <Button Name="TurnRight_Button" Grid.Column="2" Grid.Row="0" Margin="10,10,10,0" Content="-&gt;"
-                    Command="{Binding TurnRightClick, Source={StaticResource CommunicatorVM}}"
-                    IsEnabled="{Binding UserInterfaceEnabled, Source={StaticResource CommunicatorVM}}"/>
-                    <TextBox  Name="Display_TextBox" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3"
-                    Background="SteelBlue" Foreground="White" FontFamily="Global Monospace" Margin="10,10"
-                    FontSize="17" FontWeight="Bold" IsReadOnly="True" MaxLines="4" MinLines="4" MaxLength="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
-                    Text="{Binding DisplayTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
-                </Grid>
-            </GroupBox>
-
-            <!-- Row 4, debugging log -->
-            <GroupBox Header="Activity Logging" Name="ActivityLogging_GroupBox" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="4" Margin="10,10,10,10">
-                <ScrollViewer Name="ActivityLogScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                    <TextBox Name="ActivityLogging_TextBox" TextChanged="ActivityLogTextChangedHandler" IsEnabled="True" Background="WhiteSmoke" Margin="10,10,10,10" 
-                    Text="{Binding ActivityLogTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
-                </ScrollViewer>
-            </GroupBox>
-
+        <!-- Row 0: Main Menu -->
+        <Menu IsMainMenu="True" Name="menu" Height="20" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="4" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Visible">
             <!--
-        <Button Name="Toggle_Button" Grid.Column="2" Grid.Row="3"  Grid.ColumnSpan="1" Margin="10,5"
-                    IsEnabled="{Binding LedToggleActive, Source={StaticResource CommunicatorVM}}"  
-                    Command="{Binding ToggleClick, Source={StaticResource CommunicatorVM}}"
-                    Content="{Binding PushbuttonContentTxt, Source={StaticResource CommunicatorVM}}"/>
-        -->
-            <!-- Row 5 -->
-            <GroupBox Header="Communication" Name="Communication_GroupBox" Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="4" Margin="10,10,10,10">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="1*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="1*" />
-                    </Grid.RowDefinitions>
+            <MenuItem Header="_Settings">
+                <MenuItem Header="_USB Device Configuration..."  Click="menu_settings_device"/>
+                <MenuItem Header="_Advanced Settings..."  Click="menu_settings_advanced"/>
+            </MenuItem>
+            <MenuItem Header="_Calibration" />
+            -->
+            <MenuItem Header="View">
+                <!--
+                <MenuItem Header="Connection Details" Click="menu_view_connection"/>
+                <MenuItem Header="Control" Click="menu_view_control"></MenuItem>
+                <MenuItem Header="Data Logging" Click="menu_view_logging"></MenuItem>
+                -->
+                <MenuItem Header="Debugging Output" Click="menu_view_debugging"></MenuItem>
+                <MenuItem Header="Connection Details" Click="menu_view_connection"></MenuItem>
+            </MenuItem>
+            
+            <MenuItem Header="_About"   Click="menu_about"/>
+        </Menu>
 
-                    <!-- Row 0 -->
-                    <TextBlock Name="ConnectionStatus_TextBlock" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="10,10,10,10" 
-                    Text="{Binding ConnectionStatusTxt, Source={StaticResource CommunicatorVM}}"/>
-                    <TextBlock Name="Uptime_TextBlock" Grid.Column="2" Grid.Row="0" Margin="10,10,10,10"
-                    Text="{Binding UptimeTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
-                    Foreground="{Binding UserInterfaceColor, Source={StaticResource CommunicatorVM}}"/>
 
-                    <!-- Row 1-->
-                    <TextBlock Name="TxSuccessful_TextBlock" Grid.Column="0" Grid.Row="1" Margin="10,10,10,10"
-                    Text="{Binding TxSuccessfulTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
-                    Foreground="{Binding UserInterfaceColor, Source={StaticResource CommunicatorVM}}"/>
-                    <TextBlock Name="TxFailed_TextBox" Grid.Column="1" Grid.Row="1" Margin="10,10,10,10"
-                    Text="{Binding TxFailedTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
-                    Foreground="{Binding UserInterfaceColor, Source={StaticResource CommunicatorVM}}"/>
-                    <TextBlock Name="RxSuccessful_TextBlock" Grid.Column="2" Grid.Row="1" Margin="10,10,10,10"
-                    Text="{Binding RxSuccessfulTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
-                    Foreground="{Binding UserInterfaceColor, Source={StaticResource CommunicatorVM}}"/>
-                    <TextBlock Name="RxFailed_TextBox" Grid.Column="3" Grid.Row="1" Margin="10,10,10,10"
-                    Text="{Binding RxFailedTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
-                    Foreground="{Binding UserInterfaceColor, Source={StaticResource CommunicatorVM}}"/>
+        <!-- Row 1 , input and output-->
 
-                    <!-- Row 2-->
-                    <TextBlock Name="TxSpeed_TextBlock" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Margin="10,10,10,10"
-                    Text="{Binding TxSpeedTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
-                    Foreground="{Binding UserInterfaceColor, Source={StaticResource CommunicatorVM}}"/>
-                    <TextBlock Name="TxSpeed_TextBox" Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2" Margin="10,10,10,10"
-                    Text="{Binding RxSpeedTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
-                    Foreground="{Binding UserInterfaceColor, Source={StaticResource CommunicatorVM}}"/>
-                </Grid>
-            </GroupBox>
+        <GroupBox Header="Input" Name="Input_GroupBox" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="10,10,10,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                </Grid.RowDefinitions>
+                <TextBox Name="InputVoltage_TextBox"  Grid.Column="0" Grid.Row="0" Background="WhiteSmoke" Margin="10,5"
+                    Text="{Binding InputVoltageTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}" />
+                <TextBox Name="InputCurrent_TextBox"  Grid.Column="1" Grid.Row="0" Background="WhiteSmoke" Margin="10,5"
+                    Text="{Binding InputCurrentTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}" />
+                <ProgressBar Name="InputVoltage_ProgressBar" Grid.Column="0" Grid.Row="1" Minimum="0" Maximum="20" Margin="10,5"
+                    Value="{Binding InputVoltage, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                    Foreground="{Binding InputVoltageBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
+                <ProgressBar Name="InputCurrent_ProgressBar" Grid.Column="1" Grid.Row="1" Minimum="0" Maximum="5" Margin="10,5"
+                    Value="{Binding InputCurrent, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                    Foreground="{Binding InputCurrentBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
+            </Grid>
+        </GroupBox>
 
-        </Grid>
+        <GroupBox Header="Output" Name="Output_GroupBox" Grid.Column="2" Grid.Row="1" Grid.ColumnSpan="2" Margin="10,10,10,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                </Grid.RowDefinitions>
+                <TextBox Name="OutputVoltage_TextBox"  Grid.Column="0" Grid.Row="0" Background="WhiteSmoke" Margin="10,5"
+                    Text="{Binding OutputVoltageTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}" />
+                <TextBox Name="OutputCurrent_TextBox"  Grid.Column="1" Grid.Row="0" Background="WhiteSmoke" Margin="10,5"
+                    Text="{Binding OutputCurrentTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}" />
+                <ProgressBar Name="OutputVoltage_ProgressBar" Grid.Column="0" Grid.Row="1" Minimum="0" Maximum="20" Margin="10,5"
+                    Value="{Binding OutputVoltage, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                    Foreground="{Binding OutputVoltageBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
+                <ProgressBar Name="OutputCurrent_ProgressBar" Grid.Column="1" Grid.Row="1" Minimum="0" Maximum="5" Margin="10,5"
+                    Value="{Binding OutputCurrent, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                    Foreground="{Binding OutputCurrentBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
+            </Grid>
+        </GroupBox>
 
-    </ScrollViewer>
+
+        <!-- Row 2, Efficiency -->
+        <GroupBox Header="Efficiency" Name="Efficiency_GroupBox" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="4" Margin="10,10,10,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                </Grid.RowDefinitions>
+                <TextBox Name="InputPower_TextBox"  Grid.Column="0" Grid.Row="0" Background="WhiteSmoke" Margin="10,5"
+                    Text="{Binding InputPowerTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}" />
+                <TextBox Name="OutputPower_TextBox"  Grid.Column="1" Grid.Row="0" Background="WhiteSmoke" Margin="10,5"
+                    Text="{Binding OutputPowerTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}" />
+                <TextBox Name="Loss_TextBox"  Grid.Column="2" Grid.Row="0" Background="WhiteSmoke" Margin="10,5"
+                    Text="{Binding LossTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}" />
+                <TextBox Name="Efficiency_TextBox"  Grid.Column="3" Grid.Row="0" Background="WhiteSmoke" Margin="10,5"
+                    Text="{Binding EfficiencyTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}" />
+
+                <ProgressBar Name="InputPower_ProgressBar" Grid.Column="0" Grid.Row="1" Minimum="0" Maximum="80" Margin="10,5"
+                    Value="{Binding InputPower, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                    Foreground="{Binding InputPowerBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
+                <ProgressBar Name="OutputPower_ProgressBar" Grid.Column="1" Grid.Row="1" Minimum="0" Maximum="80" Margin="10,5"
+                    Value="{Binding OutputPower, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                    Foreground="{Binding OutputPowerBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
+                <ProgressBar Name="Loss_ProgressBar" Grid.Column="2" Grid.Row="1" Minimum="0" Maximum="10" Margin="10,5"
+                    Value="{Binding Loss, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                    Foreground="{Binding LossBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
+                <ProgressBar Name="Efficicy_ProgressBar" Grid.Column="3" Grid.Row="1" Minimum="0" Maximum="1" Margin="10,5"
+                    Value="{Binding Efficiency, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                    Foreground="{Binding EfficiencyBarColor, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
+            </Grid>
+        </GroupBox>
+
+        <!-- Row 3, power outputs, usb charging, temperature  -->
+        <GroupBox Header="Power Outputs" Name="PowerOut_GroupBox" Grid.Column="0" Grid.Row="3" Margin="10,10,10,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                </Grid.RowDefinitions>
+                <TextBlock Name="Output1_TextBlock" Grid.Column="0" Grid.Row="0" Margin="10,5" 
+                Text="{Binding Output1Txt, Source={StaticResource CommunicatorVM}}"/>
+                <Button Name="Out1_Button" Grid.Column="1" Grid.Row="0"  Grid.ColumnSpan="1" Margin="2,2" Content="1"
+                Command="{Binding Out1ToggleClick, Source={StaticResource CommunicatorVM}}"/>
+
+                <TextBlock Name="Output2_TextBlock" Grid.Column="0" Grid.Row="1" Margin="10,5" 
+                Text="{Binding Output2Txt, Source={StaticResource CommunicatorVM}}"/>
+                <Button Name="Out2_Button" Grid.Column="1" Grid.Row="1"  Grid.ColumnSpan="1" Margin="2,2" Content="2"
+                Command="{Binding Out2ToggleClick, Source={StaticResource CommunicatorVM}}"/>
+
+                <TextBlock Name="Output3_TextBlock" Grid.Column="0" Grid.Row="2" Margin="10,5" 
+                Text="{Binding Output3Txt, Source={StaticResource CommunicatorVM}}"/>
+                <Button Name="Out3_Button" Grid.Column="1" Grid.Row="2"  Grid.ColumnSpan="1" Margin="2,2" Content="3"
+                Command="{Binding Out3ToggleClick, Source={StaticResource CommunicatorVM}}"/>
+
+                <TextBlock Name="Output4_TextBlock" Grid.Column="0" Grid.Row="3" Margin="10,5" 
+                Text="{Binding Output4Txt, Source={StaticResource CommunicatorVM}}"/>
+                <Button Name="Out4_Button" Grid.Column="1" Grid.Row="3"  Grid.ColumnSpan="1" Margin="2,2" Content="4"
+                Command="{Binding Out4ToggleClick, Source={StaticResource CommunicatorVM}}"/>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Header="USB Charging" Name="UsbCharging_GroupBox" Grid.Column="1" Grid.Row="3" Margin="10,10,10,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                </Grid.RowDefinitions>
+                <TextBlock Name="UsbCharging_TextBlock" Grid.Column="0" Grid.Row="0" Margin="10,5" 
+                Text="{Binding UsbChargingTxt, Source={StaticResource CommunicatorVM}}"/>
+                <Button Name="Usb_Button" Grid.Column="0" Grid.Row="1"  Grid.ColumnSpan="1" Margin="2,2" Content="Toggle USB"
+                Command="{Binding UsbToggleClick, Source={StaticResource CommunicatorVM}}"/>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Header="Temperature" Name="Temperature_GroupBox" Grid.Column="2" Grid.Row="3" Margin="10,10,10,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                </Grid.RowDefinitions>
+                <TextBlock Name="TemperatureOnboard_TextBlock" Grid.Column="0" Grid.Row="0" Margin="10,5" 
+                Text="{Binding TemperatureOnboardTxt, Source={StaticResource CommunicatorVM}}"/>
+                <TextBlock Name="TemperatureExternal1_TextBlock" Grid.Column="0" Grid.Row="1" Margin="10,5" 
+                Text="{Binding TemperatureExternal1Txt, Source={StaticResource CommunicatorVM}}"/>
+                <TextBlock Name="TemperatureExternal2_TextBlock" Grid.Column="0" Grid.Row="2" Margin="10,5" 
+                Text="{Binding TemperatureExternal2Txt, Source={StaticResource CommunicatorVM}}"/>
+                <TextBlock Name="Fan_TextBlock" Grid.Column="0" Grid.Row="3" Margin="10,5" 
+                Text="{Binding FanTxt, Source={StaticResource CommunicatorVM}}"/>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Header="Date and Time" Name="DateTime_GroupBox" Grid.Column="3" Grid.Row="3" Margin="10,10,10,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                </Grid.RowDefinitions>
+                <TextBlock Name="Date_TextBlock" Grid.Row="0" Grid.Column="0" Margin="10,5" 
+                Text="{Binding DateTxt, Source={StaticResource CommunicatorVM}}"/>
+                <TextBlock Name="Time_TextBlock" Grid.Row="1" Grid.Column="0"  Margin="10,5" 
+                Text="{Binding TimeTxt, Source={StaticResource CommunicatorVM}}"/>
+                <Button Name="SystemTime_Button" Grid.Row="2" Grid.Column="0" Margin="2,2"
+                Content="Use system time"
+                Command="{Binding UseSystemTimeClick, Source={StaticResource CommunicatorVM}}"/>
+            </Grid>
+        </GroupBox>
+
+        <!-- Row 4 , charger and display-->
+
+        <GroupBox Header="Charger Details" Name="ChargerDetails_GroupBox" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" Margin="10,10,10,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                </Grid.RowDefinitions>
+                <TextBlock Name="BuckMode_TextBlock" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" Margin="10,5" 
+                Text="{Binding BuckModeTxt, Source={StaticResource CommunicatorVM}}"/>
+                <TextBlock Name="DutyCycle_TextBlock" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Margin="10,5" 
+                Text="{Binding DutyCycleTxt, Source={StaticResource CommunicatorVM}}"/>
+                <CheckBox x:Name="Manual_CheckBox" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                Content="Manual Control" HorizontalAlignment="Left" Margin="10,10"
+                IsChecked="{Binding ManualControl, Source={StaticResource CommunicatorVM}}"/>
+
+                <CheckBox x:Name="SynchronousMode_CheckBox" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                Content="Synchronous Mode" HorizontalAlignment="Left" Margin="10,10"
+                IsChecked="{Binding SynchronousMode, Source={StaticResource CommunicatorVM}}"/>
+                <Button Name="ChargerOnOff_Button" Grid.Row="3" Grid.Column="2"  Grid.ColumnSpan="2"
+                Margin="10,5" 
+                Content="{Binding OnOffButtonTxt, Source={StaticResource CommunicatorVM}}"
+                Command="{Binding ChargerOnOffClick, Source={StaticResource CommunicatorVM}}"/>
+
+                <TextBox Name="DutyCycleInput_TextBox" Grid.Row="4" Grid.Column="0"
+                    Background="WhiteSmoke" Margin="10,5"
+                    Text="{Binding DutyCycleInputTxt, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Source={StaticResource CommunicatorVM}}" />
+                <Button Name="SetDutyCycle_Button" Grid.Row="4" Grid.Column="1" Margin="10,5" Content="Set"
+                Command="{Binding SetDutycycleClick, Source={StaticResource CommunicatorVM}}"/>
+                <Button Name="DecreaseDutyCycle_Button" Grid.Row="4" Grid.Column="2" Margin="10,5" Content="-"
+                Command="{Binding DecreaseDutycycleClick, Source={StaticResource CommunicatorVM}}"/>
+                <Button Name="IncreaseDutyCycle_Button" Grid.Row="4" Grid.Column="3" Margin="10,5" Content="+"
+                Command="{Binding IncreaseDutycycleClick, Source={StaticResource CommunicatorVM}}"/>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Header="User Interface" Name="UserInterface_GroupBox" Grid.Column="2" Grid.Row="4" Grid.ColumnSpan="2" Margin="10,10,10,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="3*" />
+                </Grid.RowDefinitions>
+                <Button Name="TurnLeft_Button" Grid.Column="0" Grid.Row="0" Margin="10,10,10,0" Content="&lt;-"
+                Command="{Binding TurnLeftClick, Source={StaticResource CommunicatorVM}}"
+                IsEnabled="{Binding UserInterfaceEnabled, Source={StaticResource CommunicatorVM}}"/>
+                <Button Name="PushButton_Button" Grid.Column="1" Grid.Row="0" Margin="10,10,10,0" Content="Press"
+                Command="{Binding ButtonPressClick, Source={StaticResource CommunicatorVM}}"/>
+                <Button Name="TurnRight_Button" Grid.Column="2" Grid.Row="0" Margin="10,10,10,0" Content="-&gt;"
+                Command="{Binding TurnRightClick, Source={StaticResource CommunicatorVM}}"
+                IsEnabled="{Binding UserInterfaceEnabled, Source={StaticResource CommunicatorVM}}"/>
+                <TextBox  Name="Display_TextBox" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3"
+                Background="SteelBlue" Foreground="White" FontFamily="Global Monospace" Margin="10,10"
+                FontSize="17" FontWeight="Bold" IsReadOnly="True" MaxLines="4" MinLines="4" MaxLength="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
+                Text="{Binding DisplayTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
+            </Grid>
+        </GroupBox>
+
+        <!-- Row 5, debugging log -->
+        <GroupBox Header="Activity Logging" Name="ActivityLogging_GroupBox" Visibility="Visible" Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="4" Margin="10,10,10,10">
+            <TextBox Name="ActivityLogging_TextBox" TextChanged="ActivityLogTextChangedHandler" IsEnabled="True" Background="WhiteSmoke" Margin="10,10,10,10" 
+                        ScrollViewer.VerticalScrollBarVisibility="Auto"
+                Text="{Binding ActivityLogTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
+        </GroupBox>
+
+        <!-- Row 6 -->
+        <GroupBox Header="Communication" Name="Communication_GroupBox" Grid.Column="0" Grid.Row="6" Grid.ColumnSpan="4" Margin="10,10,10,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                </Grid.RowDefinitions>
+
+                <!-- Row 0 -->
+                <TextBlock Name="ConnectionStatus_TextBlock" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="10,10,10,10" 
+                Text="{Binding ConnectionStatusTxt, Source={StaticResource CommunicatorVM}}"/>
+                <TextBlock Name="Uptime_TextBlock" Grid.Column="2" Grid.Row="0" Margin="10,10,10,10"
+                Text="{Binding UptimeTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                Foreground="{Binding UserInterfaceColor, Source={StaticResource CommunicatorVM}}"/>
+
+                <!-- Row 1-->
+                <TextBlock Name="TxSuccessful_TextBlock" Grid.Column="0" Grid.Row="1" Margin="10,10,10,10"
+                Text="{Binding TxSuccessfulTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                Foreground="{Binding UserInterfaceColor, Source={StaticResource CommunicatorVM}}"/>
+                <TextBlock Name="TxFailed_TextBox" Grid.Column="1" Grid.Row="1" Margin="10,10,10,10"
+                Text="{Binding TxFailedTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                Foreground="{Binding UserInterfaceColor, Source={StaticResource CommunicatorVM}}"/>
+                <TextBlock Name="RxSuccessful_TextBlock" Grid.Column="2" Grid.Row="1" Margin="10,10,10,10"
+                Text="{Binding RxSuccessfulTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                Foreground="{Binding UserInterfaceColor, Source={StaticResource CommunicatorVM}}"/>
+                <TextBlock Name="RxFailed_TextBox" Grid.Column="3" Grid.Row="1" Margin="10,10,10,10"
+                Text="{Binding RxFailedTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                Foreground="{Binding UserInterfaceColor, Source={StaticResource CommunicatorVM}}"/>
+
+                <!-- Row 2-->
+                <TextBlock Name="TxSpeed_TextBlock" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Margin="10,10,10,10"
+                Text="{Binding TxSpeedTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                Foreground="{Binding UserInterfaceColor, Source={StaticResource CommunicatorVM}}"/>
+                <TextBlock Name="TxSpeed_TextBox" Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2" Margin="10,10,10,10"
+                Text="{Binding RxSpeedTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"
+                Foreground="{Binding UserInterfaceColor, Source={StaticResource CommunicatorVM}}"/>
+            </Grid>
+        </GroupBox>
+
+    </Grid>
+        
 </Window>
