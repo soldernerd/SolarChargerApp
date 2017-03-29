@@ -43,7 +43,7 @@
                 <MenuItem Header="Control" Click="menu_view_control"></MenuItem>
                 <MenuItem Header="Data Logging" Click="menu_view_logging"></MenuItem>
                 -->
-                <MenuItem Header="Debugging Output" Click="menu_view_debugging"></MenuItem>
+                <MenuItem Header="Debugging Output" Command="{Binding MenuDebuggingOutputClick, Source={StaticResource CommunicatorVM}}"/>
                 <MenuItem Header="Connection Details" Click="menu_view_connection"></MenuItem>
             </MenuItem>
             
@@ -305,7 +305,8 @@
         </GroupBox>
 
         <!-- Row 5, debugging log -->
-        <GroupBox Header="Activity Logging" Name="ActivityLogging_GroupBox" Visibility="Visible" Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="4" Margin="10,10,10,10">
+        <GroupBox Header="Activity Logging" Name="ActivityLogging_GroupBox" Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="4" Margin="10,10,10,10"
+                  Visibility="{Binding ActivityLogVisibility, Source={StaticResource CommunicatorVM}}">
             <TextBox Name="ActivityLogging_TextBox" TextChanged="ActivityLogTextChangedHandler" IsEnabled="True" Background="WhiteSmoke" Margin="10,10,10,10" 
                         ScrollViewer.VerticalScrollBarVisibility="Auto"
                 Text="{Binding ActivityLogTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>

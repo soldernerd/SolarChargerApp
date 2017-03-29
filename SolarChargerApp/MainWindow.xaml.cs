@@ -117,7 +117,7 @@ namespace SolarChargerApp
         }
         */
 
-        private void menu_view_debugging(object sender, EventArgs e)
+        public void menu_view_debugging(object sender, EventArgs e)
         {
             if (ActivityLogging_GroupBox.Visibility == Visibility.Visible)
             {
@@ -132,6 +132,7 @@ namespace SolarChargerApp
                 this.Height += 150;
             }
         }
+
 
         private void menu_view_connection(object sender, EventArgs e)
         {

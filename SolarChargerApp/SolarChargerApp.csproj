@@ -140,6 +140,7 @@
     </Compile>
     <Compile Include="CommunicatorViewModel.cs" />
     <Compile Include="Communicator.cs" />
+    <Compile Include="ConfigFile.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

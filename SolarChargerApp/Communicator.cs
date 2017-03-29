@@ -155,8 +155,8 @@ namespace SolarChargerApp
         public Communicator()
         {
             // Initialize variables
-            _Vid = 0x04D8;
-            _Pid = 0xF08E;
+            //_Vid = 0x04D8;
+            //_Pid = 0xF08E;
             TxCount = 0;
             TxFailedCount = 0;
             RxCount = 0;
@@ -178,7 +178,7 @@ namespace SolarChargerApp
             HidUtil.RaisePacketReceivedEvent += PacketReceivedHandler;
 
             //Set the device to look for / connect with
-            HidUtil.SelectDevice(new Device(_Vid, _Pid));
+            //HidUtil.SelectDevice(new Device(_Vid, _Pid));
         }
 
         //Convert binary coded decimal byte to integer

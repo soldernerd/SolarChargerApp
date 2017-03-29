@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.ComponentModel;
 using System.Windows.Threading;
 using hid;
+using ConfigurationFile;
 
 
 namespace SolarChargerApp
@@ -24,6 +25,7 @@ namespace SolarChargerApp
     public class CommunicatorViewModel : INotifyPropertyChanged
     {
         private Communicator communicator;
+        private ConfigFile config;
         DispatcherTimer timer;
         private DateTime ConnectedTimestamp = DateTime.Now;
         public string ActivityLogTxt { get; private set; }
@@ -31,14 +33,21 @@ namespace SolarChargerApp
         private bool _ManualControl = false;
         private bool _SynchronousMode = false;
 
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public CommunicatorViewModel()
         {
+            //Vid = 0x04D8;
+            //_Pid = 0xF08E;
+            config = new ConfigFile("config.xml");
+
             communicator = new Communicator();
             communicator.HidUtil.RaiseDeviceAddedEvent += DeviceAddedEventHandler;
             communicator.HidUtil.RaiseDeviceRemovedEvent += DeviceRemovedEventHandler;
             communicator.HidUtil.RaiseConnectionStatusChangedEvent += ConnectionStatusChangedHandler;
+            communicator.Vid = config.VendorId;
+            communicator.Pid = config.ProductId;
 
             //Configure and start timer
             timer = new DispatcherTimer();
@@ -204,6 +213,17 @@ namespace SolarChargerApp
             }
         }
 
+        public void MenuDebuggingOutputToggle()
+        {
+            WriteLog("Menu item clicked", false);
+            config.ActivityLogVisible = !config.ActivityLogVisible;
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogVisibility"));
+            }
+        }
+
         public void SetDutycycle()
         {
             WriteLog(string.Format("Set dutycycle to {0}", DutycycleInput.ToString()), false);
@@ -316,6 +336,14 @@ namespace SolarChargerApp
             get
             {
                 return new UiCommand(this.ChargerOnOff, communicator.RequestValid);
+            }
+        }
+
+        public ICommand MenuDebuggingOutputClick
+        {
+            get
+            {
+                return new UiCommand(this.MenuDebuggingOutputToggle, communicator.RequestValid);
             }
         }
 
@@ -1153,7 +1181,16 @@ namespace SolarChargerApp
             }
         }
 
-
+        public string ActivityLogVisibility
+        {
+            get
+            {
+                if (config.ActivityLogVisible)
+                    return "Visible";
+                else
+                    return "Collapsed";
+            }
+        }
     }
 
 }
