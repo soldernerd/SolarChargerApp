@@ -32,6 +32,8 @@ namespace SolarChargerApp
         private byte DutycycleInput;
         private bool _ManualControl = false;
         private bool _SynchronousMode = false;
+        private int _WindowPositionX;
+        private int _WindowPositionY;
 
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -41,6 +43,8 @@ namespace SolarChargerApp
             //Vid = 0x04D8;
             //_Pid = 0xF08E;
             config = new ConfigFile("config.xml");
+            _WindowPositionX = config.PositionX;
+            _WindowPositionY = config.PositionY;
 
             communicator = new Communicator();
             communicator.HidUtil.RaiseDeviceAddedEvent += DeviceAddedEventHandler;
@@ -55,7 +59,15 @@ namespace SolarChargerApp
             timer.Tick += TimerTickHandler;
             timer.Start();
 
-            WriteLog("Program started", true);
+            WriteLog("Program started", true);      
+        }
+
+        //Destructor
+        ~CommunicatorViewModel()
+        {
+            //Save data to config file
+            config.PositionX = _WindowPositionX;
+            config.PositionY = _WindowPositionY;
         }
 
         /*
@@ -338,7 +350,7 @@ namespace SolarChargerApp
                 return new UiCommand(this.ChargerOnOff, communicator.RequestValid);
             }
         }
-
+        
         public ICommand MenuDebuggingOutputClick
         {
             get
@@ -429,7 +441,10 @@ namespace SolarChargerApp
                 PropertyChanged(this, new PropertyChangedEventArgs("RxSuccessfulTxt"));
                 PropertyChanged(this, new PropertyChangedEventArgs("RxFailedTxt"));
                 PropertyChanged(this, new PropertyChangedEventArgs("TxSpeedTxt"));
-                PropertyChanged(this, new PropertyChangedEventArgs("RxSpeedTxt"));   
+                PropertyChanged(this, new PropertyChangedEventArgs("RxSpeedTxt"));
+
+                PropertyChanged(this, new PropertyChangedEventArgs("WindowPositionX"));
+                PropertyChanged(this, new PropertyChangedEventArgs("WindowPositionY"));
             }
         }
 
@@ -1189,6 +1204,93 @@ namespace SolarChargerApp
                     return "Visible";
                 else
                     return "Collapsed";
+            }
+            set
+            {
+                if (value == "Visible")
+                    config.ActivityLogVisible = true;
+                else
+                    config.ActivityLogVisible = false;
+            }
+        }
+
+        public string OutputsVisibility
+        {
+            get
+            {
+                if (config.OutputsVisible)
+                    return "Visible";
+                else
+                    return "Collapsed";
+            }
+            set
+            {
+                if (value == "Visible")
+                    config.OutputsVisible = true;
+                else
+                    config.OutputsVisible = false;
+            }
+        }
+
+        public string ChargerDisplayVisibility
+        {
+            get
+            {
+                if (config.ChargerDisplayVisible)
+                    return "Visible";
+                else
+                    return "Collapsed";
+            }
+            set
+            {
+                if (value == "Visible")
+                    config.ChargerDisplayVisible = true;
+                else
+                    config.ChargerDisplayVisible = false;
+            }
+        }
+
+        public string CommunicationVisibility
+        {
+            get
+            {
+                if (config.ConnectionDetailsVisible)
+                    return "Visible";
+                else
+                    return "Collapsed";
+            }
+            set
+            {
+                if (value == "Visible")
+                    config.ConnectionDetailsVisible = true;
+                else
+                    config.ConnectionDetailsVisible = false;
+            }
+        }
+
+        public int WindowPositionX
+        {
+            get
+            {
+                return _WindowPositionX;
+            }
+            set
+            {
+                WriteLog(string.Format("X Position changed to {0}", value), false);
+                _WindowPositionX = value;
+            }
+        }
+
+        public int WindowPositionY
+        {
+            get
+            {
+                return _WindowPositionY;
+            }
+            set
+            {
+                WriteLog(string.Format("Y Position changed to {0}", value), false);
+                _WindowPositionY = value;
             }
         }
     }

@@ -7,11 +7,11 @@ using System.Windows;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("HidUtilityDemo")]
+[assembly: AssemblyTitle("Soldernerd Solar Charger App")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Soldernerd.com")]
-[assembly: AssemblyProduct("HidUtilityDemo")]
+[assembly: AssemblyProduct("Solar Charger App")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

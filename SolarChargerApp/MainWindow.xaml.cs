@@ -30,6 +30,77 @@ namespace SolarChargerApp
             InitializeComponent();
         }
 
+        private void FreezeWindowSize(object sender, EventArgs e)
+        {
+            this.MinWidth = this.ActualWidth;
+            this.MinHeight = this.ActualHeight;
+            this.MaxWidth = this.ActualWidth;
+            this.MaxHeight = this.ActualHeight;
+        }
+
+        private void ResizeToContent(object sender, EventArgs e)
+        {
+            this.MinWidth = 0;
+            this.MinHeight = 0;
+            this.MaxWidth = 10000;
+            this.MaxHeight = 10000;
+            this.SizeToContent = SizeToContent.Manual;
+            this.SizeToContent = SizeToContent.WidthAndHeight;
+        }
+
+        private void menu_view_connection(object sender, EventArgs e)
+        {
+            if (Communication_GroupBox.Visibility == Visibility.Visible)
+            {
+                Communication_GroupBox.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                Communication_GroupBox.Visibility = Visibility.Visible;
+            }
+            ResizeToContent(sender, e);
+        }
+
+        private void ExpandCollapseGroupBox(GroupBox box)
+        {
+            if (box.Visibility == Visibility.Visible)
+            {
+                box.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                box.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void ExpandCollapse(object sender, EventArgs e)
+        {
+            MenuItem item = (MenuItem)sender;
+            switch (item.Name)
+            {
+                case "MenuItem_Outputs":
+                    ExpandCollapseGroupBox(this.PowerOut_GroupBox);
+                    ExpandCollapseGroupBox(this.UsbCharging_GroupBox);
+                    ExpandCollapseGroupBox(this.Temperature_GroupBox);
+                    ExpandCollapseGroupBox(this.DateTime_GroupBox);
+                    break;
+                case "MenuItem_ChargerDisplay":
+                    ExpandCollapseGroupBox(this.ChargerDetails_GroupBox);
+                    ExpandCollapseGroupBox(this.UserInterface_GroupBox);
+                    break;
+                case "MenuItem_ActivityLog":
+                    ExpandCollapseGroupBox(this.ActivityLogging_GroupBox);
+                    break;
+                case "MenuItem_ConnectionDetail":
+                    ExpandCollapseGroupBox(this.Communication_GroupBox);
+                    break;
+            }
+            //Resize window
+            ResizeToContent(sender, e);
+        }
+
+
+
         // Update when focus is lost
         public void FocusLostHandler(object sender, EventArgs e)
         {
@@ -72,83 +143,5 @@ namespace SolarChargerApp
         {
             MessageBox.Show("Lukas Fässler, 2017\nlfaessler@gmx.net\n\nVisit soldernerd.com for more information", "About Solar Charger App");
         }
-
-        /*
-        private void menu_view_connection(object sender, EventArgs e)
-        {
-            if (gb_connection.Visibility == Visibility.Visible)
-            {
-                gb_connection.Visibility = Visibility.Collapsed;
-                this.Height -= gb_connection.Height;
-            }
-            else
-            {
-                gb_connection.Visibility = Visibility.Visible;
-                this.Height += gb_connection.Height;
-            }
-        }
-
-        private void menu_view_control(object sender, EventArgs e)
-        {
-            if (gb_control.Visibility == Visibility.Visible)
-            {
-                gb_control.Visibility = Visibility.Collapsed;
-                this.Height -= gb_control.Height;
-            }
-            else
-            {
-                gb_control.Visibility = Visibility.Visible;
-                this.Height += gb_control.Height;
-            }
-        }
-
-        private void menu_view_logging(object sender, EventArgs e)
-        {
-            if (gb_logging.Visibility == Visibility.Visible)
-            {
-                gb_logging.Visibility = Visibility.Collapsed;
-                this.Height -= gb_logging.Height;
-            }
-            else
-            {
-                gb_logging.Visibility = Visibility.Visible;
-                this.Height += gb_logging.Height;
-            }
-        }
-        */
-
-        public void menu_view_debugging(object sender, EventArgs e)
-        {
-            if (ActivityLogging_GroupBox.Visibility == Visibility.Visible)
-            {
-                ActivityLogging_GroupBox.Visibility = Visibility.Collapsed;
-                this.ActivityLog_Row.Height = new GridLength(0);
-                this.Height -= 150;
-            }
-            else
-            {
-                ActivityLogging_GroupBox.Visibility = Visibility.Visible;
-                this.ActivityLog_Row.Height = new GridLength(150);
-                this.Height += 150;
-            }
-        }
-
-
-        private void menu_view_connection(object sender, EventArgs e)
-        {
-            if (Communication_GroupBox.Visibility == Visibility.Visible)
-            {
-                Communication_GroupBox.Visibility = Visibility.Collapsed;
-                this.Connection_Row.Height = new GridLength(0);
-                this.Height -= 150;
-            }
-            else
-            {
-                Communication_GroupBox.Visibility = Visibility.Visible;
-                this.Connection_Row.Height = new GridLength(150);
-                this.Height += 150;
-            }
-        }
-
     }
 }
