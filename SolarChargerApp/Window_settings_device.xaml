@@ -1,0 +1,50 @@
+﻿<Window x:Class="SolarChargerApp.Window_settings_device"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SolarChargerApp"
+        mc:Ignorable="d"
+        Title="USB Device Configuration" 
+        SizeToContent="WidthAndHeight"
+        WindowState="Normal"
+        ResizeMode="CanMinimize">
+
+    <Window.DataContext>
+        <StaticResourceExtension ResourceKey="CommunicatorVM"/>
+    </Window.DataContext>
+
+    <Grid Height="150" Width="320">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+
+        
+        <GroupBox Header="Vid" Grid.Column="0" Grid.Row="0" Width="80" Height="45" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,10,10">
+            <TextBox Name="Vid_TextBox" Text="{Binding VidTxt, Mode=TwoWay, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" IsEnabled="True" MaxLength="6" Background="WhiteSmoke" Width="60" Height="20"/>
+        </GroupBox>
+        <GroupBox Header="Pid" Grid.Column="1" Grid.Row="0" Width="80" Height="45" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,10,10">
+            <TextBox Name="Pid_TextBox" Text="{Binding PidTxt, Mode=TwoWay, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" IsEnabled="True" MaxLength="6" Background="WhiteSmoke" Width="60" Height="20"/>
+        </GroupBox>
+
+        <Button Name="PidVidSave_Button" Grid.Column="0" Grid.Row="1" 
+                Click="PidVidSave_Click"
+                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,10,10"
+                IsEnabled="true" Width="100" Height="20">Save Changes
+        </Button>
+        <!--="{Binding SavePidVidClick, Source={StaticResource CommunicatorVM}}" -->
+
+        <Button Name="PidVidReset_Button" Grid.Column="1" Grid.Row="1" 
+                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,10,10"
+                Command="{Binding ResetPidVidClick, Source={StaticResource CommunicatorVM}}"
+                IsEnabled="true" Width="100" Height="20">Undo Changes
+        </Button>
+
+    </Grid>
+
+</Window>

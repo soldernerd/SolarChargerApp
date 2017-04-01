@@ -16,9 +16,6 @@
         Left="{Binding WindowPositionX, Mode=TwoWay}"
         Top="{Binding WindowPositionY, Mode=TwoWay}">
 
-    <Window.Resources>
-        <local:CommunicatorViewModel x:Key="CommunicatorVM"/>
-    </Window.Resources>
     <Window.DataContext>
         <StaticResourceExtension ResourceKey="CommunicatorVM"/>
     </Window.DataContext>
@@ -51,7 +48,7 @@
             -->
             <MenuItem Header="View">
                 <!--
-                <MenuItem Header="Connection Details" Click="menu_view_connection"/>
+                
                 <MenuItem Header="Control" Click="menu_view_control"></MenuItem>
                 <MenuItem Header="Data Logging" Click="menu_view_logging"></MenuItem>
                 -->
@@ -61,8 +58,8 @@
                 <MenuItem Header="Activity Log" Name="MenuItem_ActivityLog" Click="ExpandCollapse"></MenuItem>
                 <MenuItem Header="Connection Details" Name="MenuItem_ConnectionDetail" Click="ExpandCollapse"></MenuItem>
             </MenuItem>
-            
-            <MenuItem Header="_About"   Click="menu_about"/>
+            <MenuItem Header="Connection" Click="menu_window_connection"/>
+            <MenuItem Header="_About"   Click="menu_window_about"/>
         </Menu>
 
 

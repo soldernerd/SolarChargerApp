@@ -187,6 +187,28 @@ namespace SolarChargerApp
             }
         }
 
+        public void SavePidVid()
+        {
+            WriteLog("Save button clicked", false);
+            communicator.RequestPowerOutputMode(Communicator.PowerOutput.PowerOutput1, Communicator.PowerOutputAction.Toggle);
+            //TextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
+            }
+        }
+
+        public void ResetPidVid()
+        {
+            WriteLog("Reset button clicked", false);
+            PropertyChanged(this, new PropertyChangedEventArgs("VidTxt"));
+            PropertyChanged(this, new PropertyChangedEventArgs("PidTxt"));
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
+            }
+        }
+
         public void ChargerOnOff()
         {
             if (OnOffButtonTxt == "Turn charger on")
@@ -356,6 +378,22 @@ namespace SolarChargerApp
             get
             {
                 return new UiCommand(this.MenuDebuggingOutputToggle, communicator.RequestValid);
+            }
+        }
+
+        public ICommand SavePidVidClick
+        {
+            get
+            {
+                return new UiCommand(this.SavePidVid, communicator.RequestValid);
+            }
+        }
+
+        public ICommand ResetPidVidClick
+        {
+            get
+            {
+                return new UiCommand(this.ResetPidVid, communicator.RequestValid);
             }
         }
 
@@ -564,6 +602,7 @@ namespace SolarChargerApp
                 string log = string.Format("Trying to connect (VID=0x{0:X4} PID=0x{1:X4})", communicator.Vid, communicator.Pid);
                 WriteLog(log, false);
                 PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
+                config.VendorId = communicator.Vid;
             }
         }
 
@@ -579,6 +618,7 @@ namespace SolarChargerApp
                 string log = string.Format("Trying to connect (VID=0x{0:X4} PID=0x{1:X4})", communicator.Vid, communicator.Pid);
                 WriteLog(log, false);
                 PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
+                config.ProductId = communicator.Pid;
             }
         }
 
@@ -1276,7 +1316,6 @@ namespace SolarChargerApp
             }
             set
             {
-                WriteLog(string.Format("X Position changed to {0}", value), false);
                 _WindowPositionX = value;
             }
         }
@@ -1289,7 +1328,6 @@ namespace SolarChargerApp
             }
             set
             {
-                WriteLog(string.Format("Y Position changed to {0}", value), false);
                 _WindowPositionY = value;
             }
         }

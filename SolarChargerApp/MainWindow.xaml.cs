@@ -139,9 +139,16 @@ namespace SolarChargerApp
             //ActivityLogScrollViewer.ScrollToBottom();
         }
 
-        private void menu_about(object sender, EventArgs e)
+        private void menu_window_about(object sender, EventArgs e)
         {
             MessageBox.Show("Lukas Fässler, 2017\nlfaessler@gmx.net\n\nVisit soldernerd.com for more information", "About Solar Charger App");
+        }
+
+        private void menu_window_connection(object sender, EventArgs e)
+        {
+            Window_settings_device subWindow = new Window_settings_device(this);
+            InitializeComponent();
+            subWindow.Show();
         }
     }
 }

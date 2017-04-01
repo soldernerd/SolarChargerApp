@@ -4,6 +4,6 @@
              xmlns:local="clr-namespace:SolarChargerApp"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-
+        <local:CommunicatorViewModel x:Key="CommunicatorVM"/>
     </Application.Resources>
 </Application>
