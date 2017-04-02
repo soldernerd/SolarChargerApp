@@ -187,6 +187,7 @@ namespace SolarChargerApp
             }
         }
 
+        /*
         public void SavePidVid()
         {
             WriteLog("Save button clicked", false);
@@ -197,14 +198,39 @@ namespace SolarChargerApp
                 PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
             }
         }
+        */
 
         public void ResetPidVid()
         {
-            WriteLog("Reset button clicked", false);
-            PropertyChanged(this, new PropertyChangedEventArgs("VidTxt"));
-            PropertyChanged(this, new PropertyChangedEventArgs("PidTxt"));
+            WriteLog("Reset Pid/Vid button clicked", false);
             if (PropertyChanged != null)
             {
+                PropertyChanged(this, new PropertyChangedEventArgs("VidTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("PidTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
+            }
+        }
+
+        public void ResetCalibration()
+        {
+            WriteLog("Reset calibration button clicked", false);
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs("CalibrationInputVoltageOffsetTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("CalibrationInputVoltageSlopeCorrectionTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("CalibrationOutputVoltageOffsetTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("CalibrationOutputVoltageSlopeCorrectionTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("CalibrationInputCurrentOffsetTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("CalibrationInputCurrentSlopeCorrectionTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("CalibrationOutputCurrentOffsetTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("CalibrationOutputCurrentSlopeCorrectionTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("CalibrationOnboardTemperatureOffsetTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("CalibrationOnboardTemperatureSlopeCorrectionTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("CalibrationExternalTemperature1OffsetTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("CalibrationExternalTemperature1SlopeCorrectionTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("CalibrationExternalTemperature2OffsetTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("CalibrationExternalTemperature2SlopeCorrectionTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("CalibrationRealTimeClockTxt"));
                 PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
             }
         }
@@ -381,6 +407,7 @@ namespace SolarChargerApp
             }
         }
 
+        /*
         public ICommand SavePidVidClick
         {
             get
@@ -388,12 +415,21 @@ namespace SolarChargerApp
                 return new UiCommand(this.SavePidVid, communicator.RequestValid);
             }
         }
+        */
 
         public ICommand ResetPidVidClick
         {
             get
             {
                 return new UiCommand(this.ResetPidVid, communicator.RequestValid);
+            }
+        }
+
+        public ICommand ResetCalibrationClick
+        {
+            get
+            {
+                return new UiCommand(this.ResetCalibration, communicator.RequestValid);
             }
         }
 
@@ -1329,6 +1365,186 @@ namespace SolarChargerApp
             set
             {
                 _WindowPositionY = value;
+            }
+        }
+
+        public string CalibrationInputVoltageOffsetTxt
+        {
+            get { return string.Format("{0:D}", communicator.CalibrationInputVoltageOffset); }
+            set
+            {
+                Int16 new_value = Int16.Parse(value);
+                if (new_value != communicator.CalibrationInputVoltageOffset)
+                communicator.SetCalibration(Communicator.CalibrationItem.InputVoltageOffset, new_value);
+                WriteLog(string.Format("InputVoltageOffset set to : {0:D}", new_value), false);
+            }
+        }
+
+        public string CalibrationInputVoltageSlopeCorrectionTxt
+        {
+            get { return string.Format("{0:F6}", communicator.CalibrationInputVoltageSlopeCorrection); }
+            set
+            {
+                float new_value = float.Parse(value);
+                if (new_value != communicator.CalibrationInputVoltageSlopeCorrection)
+                    communicator.SetCalibration(Communicator.CalibrationItem.InputVoltageSlope, new_value);
+                WriteLog(string.Format("InputVoltageSlopeCorrection set to : {0:F6}", new_value), false);
+            }
+        }
+
+        public string CalibrationOutputVoltageOffsetTxt
+        {
+            get { return string.Format("{0:D}", communicator.CalibrationOutputVoltageOffset); }
+            set
+            {
+                Int16 new_value = Int16.Parse(value);
+                if (new_value != communicator.CalibrationOutputVoltageOffset)
+                    communicator.SetCalibration(Communicator.CalibrationItem.OutputVoltageOffset, new_value);
+                WriteLog(string.Format("OutputVoltageOffset set to : {0:D}", new_value), false);
+            }
+        }
+
+        public string CalibrationOutputVoltageSlopeCorrectionTxt
+        {
+            get { return string.Format("{0:F6}", communicator.CalibrationOutputVoltageSlopeCorrection); }
+            set
+            {
+                float new_value = float.Parse(value);
+                if (new_value != communicator.CalibrationOutputVoltageSlopeCorrection)
+                    communicator.SetCalibration(Communicator.CalibrationItem.OutputVoltageSlope, new_value);
+                WriteLog(string.Format("OutputVoltageSlopeCorrection set to : {0:F6}", new_value), false);
+            }
+        }
+
+        public string CalibrationInputCurrentOffsetTxt
+        {
+            get { return string.Format("{0:D}", communicator.CalibrationInputCurrentOffset); }
+            set
+            {
+                Int16 new_value = Int16.Parse(value);
+                if (new_value != communicator.CalibrationInputCurrentOffset)
+                    communicator.SetCalibration(Communicator.CalibrationItem.InputCurrentOffset, new_value);
+                WriteLog(string.Format("InputCurrentOffset set to : {0:D}", new_value), false);
+            }
+        }
+
+        public string CalibrationInputCurrentSlopeCorrectionTxt
+        {
+            get { return string.Format("{0:F6}", communicator.CalibrationInputCurrentSlopeCorrection); }
+            set
+            {
+                float new_value = float.Parse(value);
+                if (new_value != communicator.CalibrationInputCurrentSlopeCorrection)
+                    communicator.SetCalibration(Communicator.CalibrationItem.InputCurrentSlope, new_value);
+                WriteLog(string.Format("InputCurrentSlopeCorrection set to : {0:F6}", new_value), false);
+            }
+        }
+
+        public string CalibrationOutputCurrentOffsetTxt
+        {
+            get { return string.Format("{0:D}", communicator.CalibrationOutputCurrentOffset); }
+            set
+            {
+                Int16 new_value = Int16.Parse(value);
+                if (new_value != communicator.CalibrationOutputCurrentOffset)
+                    communicator.SetCalibration(Communicator.CalibrationItem.OutputCurrentOffset, new_value);
+                WriteLog(string.Format("OutputCurrentOffset set to : {0:D}", new_value), false);
+            }
+        }
+
+        public string CalibrationOutputCurrentSlopeCorrectionTxt
+        {
+            get { return string.Format("{0:F6}", communicator.CalibrationOutputCurrentSlopeCorrection); }
+            set
+            {
+                float new_value = float.Parse(value);
+                if (new_value != communicator.CalibrationOutputCurrentSlopeCorrection)
+                    communicator.SetCalibration(Communicator.CalibrationItem.OutputCurrentSlope, new_value);
+                WriteLog(string.Format("OutputCurrentSlopeCorrection set to : {0:F6}", new_value), false);
+            }
+        }
+
+        public string CalibrationOnboardTemperatureOffsetTxt
+        {
+            get { return string.Format("{0:D}", communicator.CalibrationOnboardTemperatureOffset); }
+            set
+            {
+                Int16 new_value = Int16.Parse(value);
+                if (new_value != communicator.CalibrationOnboardTemperatureOffset)
+                    communicator.SetCalibration(Communicator.CalibrationItem.OnboardTemperatureOffset, new_value);
+                WriteLog(string.Format("OnboardTemperatureOffset set to : {0:D}", new_value), false);
+            }
+        }
+
+        public string CalibrationOnboardTemperatureSlopeCorrectionTxt
+        {
+            get { return string.Format("{0:F6}", communicator.CalibrationOnboardTemperatureSlopeCorrection); }
+            set
+            {
+                float new_value = float.Parse(value);
+                if (new_value != communicator.CalibrationOnboardTemperatureSlopeCorrection)
+                    communicator.SetCalibration(Communicator.CalibrationItem.OnboardTemperatureSlope, new_value);
+                WriteLog(string.Format("OnboardTemperatureSlopeCorrection set to : {0:F6}", new_value), false);
+            }
+        }
+
+        public string CalibrationExternalTemperature1OffsetTxt
+        {
+            get { return string.Format("{0:D}", communicator.CalibrationExternalTemperature1Offset); }
+            set
+            {
+                Int16 new_value = Int16.Parse(value);
+                if (new_value != communicator.CalibrationExternalTemperature1Offset)
+                    communicator.SetCalibration(Communicator.CalibrationItem.ExternalTemperature1Offset, new_value);
+                WriteLog(string.Format("ExternalTemperature1Offset set to : {0:D}", new_value), false);
+            }
+        }
+
+        public string CalibrationExternalTemperature1SlopeCorrectionTxt
+        {
+            get { return string.Format("{0:F6}", communicator.CalibrationExternalTemperature1SlopeCorrection); }
+            set
+            {
+                float new_value = float.Parse(value);
+                if (new_value != communicator.CalibrationExternalTemperature1SlopeCorrection)
+                    communicator.SetCalibration(Communicator.CalibrationItem.ExternalTemperature1Slope, new_value);
+                WriteLog(string.Format("ExternalTemperature1SlopeCorrection set to : {0:F6}", new_value), false);
+            }
+        }
+
+        public string CalibrationExternalTemperature2OffsetTxt
+        {
+            get { return string.Format("{0:D}", communicator.CalibrationExternalTemperature2Offset); }
+            set
+            {
+                Int16 new_value = Int16.Parse(value);
+                if (new_value != communicator.CalibrationExternalTemperature2Offset)
+                    communicator.SetCalibration(Communicator.CalibrationItem.ExternalTemperature2Offset, new_value);
+                WriteLog(string.Format("ExternalTemperature2Offset set to : {0:D}", new_value), false);
+            }
+        }
+
+        public string CalibrationExternalTemperature2SlopeCorrectionTxt
+        {
+            get { return string.Format("{0:F6}", communicator.CalibrationExternalTemperature2SlopeCorrection); }
+            set
+            {
+                float new_value = float.Parse(value);
+                if (new_value != communicator.CalibrationExternalTemperature2SlopeCorrection)
+                    communicator.SetCalibration(Communicator.CalibrationItem.ExternalTemperature2Slope, new_value);
+                WriteLog(string.Format("ExternalTemperature2SlopeCorrection set to : {0:F6}", new_value), false);
+            }
+        }
+
+        public string CalibrationRealTimeClockTxt
+        {
+            get { return string.Format("{0:D}", communicator.CalibrationRealTimeClock); }
+            set
+            {
+                Int16 new_value = Int16.Parse(value);
+                if (new_value != communicator.CalibrationRealTimeClock)
+                    communicator.SetRealTimeClockCalibration(new_value);
+                WriteLog(string.Format("CalibrationRealTimeClock set to : {0:D}", new_value), false);
             }
         }
     }

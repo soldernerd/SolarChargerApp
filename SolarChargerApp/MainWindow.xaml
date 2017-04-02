@@ -39,26 +39,14 @@
 
         <!-- Row 0: Main Menu -->
         <Menu IsMainMenu="True" Name="menu" Height="20" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="4" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Visible">
-            <!--
-            <MenuItem Header="_Settings">
-                <MenuItem Header="_USB Device Configuration..."  Click="menu_settings_device"/>
-                <MenuItem Header="_Advanced Settings..."  Click="menu_settings_advanced"/>
-            </MenuItem>
-            <MenuItem Header="_Calibration" />
-            -->
             <MenuItem Header="View">
-                <!--
-                
-                <MenuItem Header="Control" Click="menu_view_control"></MenuItem>
-                <MenuItem Header="Data Logging" Click="menu_view_logging"></MenuItem>
-                -->
-                <!--<MenuItem Header="Debugging Output" Command="{Binding MenuDebuggingOutputClick, Source={StaticResource CommunicatorVM}}"/>-->
                 <MenuItem Header="Outputs and Time" Name="MenuItem_Outputs" Click="ExpandCollapse"></MenuItem>
                 <MenuItem Header="Charger and Display" Name="MenuItem_ChargerDisplay" Click="ExpandCollapse"></MenuItem>
                 <MenuItem Header="Activity Log" Name="MenuItem_ActivityLog" Click="ExpandCollapse"></MenuItem>
                 <MenuItem Header="Connection Details" Name="MenuItem_ConnectionDetail" Click="ExpandCollapse"></MenuItem>
             </MenuItem>
-            <MenuItem Header="Connection" Click="menu_window_connection"/>
+            <MenuItem Header="Connection" Click="menu_window_device"/>
+            <MenuItem Header="Calibration" Click="menu_window_calibration"/>
             <MenuItem Header="_About"   Click="menu_window_about"/>
         </Menu>
 

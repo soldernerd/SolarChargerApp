@@ -71,6 +71,21 @@ namespace SolarChargerApp
         public uint[] InputCurrentAdc { get; private set; } = { 0, 0, 0, 0 };
         public uint[] OutputCurrentAdc { get; private set; } = { 0, 0, 0, 0 };
         public uint TimeSlot { get; private set; }
+        public Int16 CalibrationInputVoltageOffset { get; private set; }
+        public float CalibrationInputVoltageSlopeCorrection { get; private set; }
+        public Int16 CalibrationOutputVoltageOffset { get; private set; }
+        public float CalibrationOutputVoltageSlopeCorrection { get; private set; }
+        public Int16 CalibrationInputCurrentOffset { get; private set; }
+        public float CalibrationInputCurrentSlopeCorrection { get; private set; }
+        public Int16 CalibrationOutputCurrentOffset { get; private set; }
+        public float CalibrationOutputCurrentSlopeCorrection { get; private set; }
+        public Int16 CalibrationOnboardTemperatureOffset { get; private set; }
+        public float CalibrationOnboardTemperatureSlopeCorrection { get; private set; }
+        public Int16 CalibrationExternalTemperature1Offset { get; private set; }
+        public float CalibrationExternalTemperature1SlopeCorrection { get; private set; }
+        public Int16 CalibrationExternalTemperature2Offset { get; private set; }
+        public float CalibrationExternalTemperature2SlopeCorrection { get; private set; }
+        public Int16 CalibrationRealTimeClock { get; private set; }
 
         public class UsbCommand
         {
@@ -709,9 +724,9 @@ namespace SolarChargerApp
             PendingCommands.Add(cmd);
         }
 
-        public void SetRealTimeClockCalibration(byte calibration)
+        public void SetRealTimeClockCalibration(Int16 calibration)
         {
-            UsbCommand cmd = new UsbCommand(0x52, calibration);
+            UsbCommand cmd = new UsbCommand(0x52, (byte) calibration);
             PendingCommands.Add(cmd);
         }
 
