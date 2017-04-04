@@ -25,9 +25,9 @@ namespace SolarChargerApp
         public HidUtility HidUtil { get; set; }
         private ushort _Vid;
         private ushort _Pid;
+        public List<byte> PacketsToRequest { get; set; }
         private List<UsbCommand> PendingCommands;
         public bool WaitingForDevice { get; private set; }
-        private byte LastCommand;
         public uint AdcValue { get; private set; }
         public bool PushbuttonPressed { get; private set; }
         public uint TxCount { get; private set; }
@@ -86,6 +86,8 @@ namespace SolarChargerApp
         public Int16 CalibrationExternalTemperature2Offset { get; private set; }
         public float CalibrationExternalTemperature2SlopeCorrection { get; private set; }
         public Int16 CalibrationRealTimeClock { get; private set; }
+
+        public Calibration InputVoltageCalibration { get; private set; }
 
         public class UsbCommand
         {
@@ -158,9 +160,99 @@ namespace SolarChargerApp
                 return ByteList;
             
             }
+        } // End of UsbCommand
 
+        public class Calibration
+        {
+            public Int16 NeutralOffset { get; private set; }
+            public Int16 NeutralMultiplier { get; private set; }
+            public byte NeutralShift { get; private set; }
+            public Int16 Offset { get; set; }
+            public Int16 Multiplier { get; set; }
+            public byte Shift { get; set; }
+            public Int16 AutoCalibration { get; private set; }
 
-        }
+            public Calibration(byte[] ByteArray, int StartIndex)
+            {
+                this.NeutralOffset = BitConverter.ToInt16(ByteArray, StartIndex);
+                this.NeutralMultiplier = BitConverter.ToInt16(ByteArray, StartIndex + 2);
+                this.NeutralShift = ByteArray[StartIndex + 4];
+                this.Offset = BitConverter.ToInt16(ByteArray, StartIndex + 5);
+                this.Multiplier = BitConverter.ToInt16(ByteArray, StartIndex + 7);
+                this.Shift = ByteArray[StartIndex + 9];
+                this.AutoCalibration = BitConverter.ToInt16(ByteArray, StartIndex + 10);
+            }
+
+            private struct ScaleParameters
+            {
+                public Int16 Multiplier;
+                public byte Shift;
+
+                public ScaleParameters(Int16 multiplier, byte shift)
+                {
+                    Multiplier = multiplier;
+                    Shift = shift;
+                }
+            }
+
+            private ScaleParameters scale(float factor)
+            {
+                Int16 multiplier;
+                byte shift;
+
+                shift = 0;
+                while (Math.Abs(factor) < (2 ^ 15 - 1))
+                {
+                    ++shift;
+                    factor *= 2;
+                }
+                multiplier = (Int16)Math.Round(factor);
+                while (multiplier % 2 == 0)
+                {
+                    --shift;
+                    multiplier /= 2;
+                }
+
+                return new ScaleParameters(multiplier, shift);
+            }
+
+            public float NeutralSlope
+            {
+                get
+                {
+                    return ((float)NeutralMultiplier) / (2 ^ NeutralShift);
+                }
+            }
+
+            public float Slope
+            {
+                get
+                {
+                    return ((float)Multiplier) / ((float)Math.Pow(2, Shift));
+                }
+                set
+                {
+                    ScaleParameters parameters = scale(value);
+                    Multiplier = parameters.Multiplier;
+                    Shift = parameters.Shift;
+                }
+            }
+
+            public float SlopeCorrection
+            {
+                get
+                {
+                    return this.Slope / this.NeutralSlope;
+                }
+                set
+                {
+                    ScaleParameters parameters = scale(value * NeutralSlope);
+                    Multiplier = parameters.Multiplier;
+                    Shift = parameters.Shift;
+                }
+            }
+        } // End of Calibration
+
 
         //Others
         private bool _NewStatusAvailable;
@@ -170,14 +262,17 @@ namespace SolarChargerApp
         public Communicator()
         {
             // Initialize variables
-            //_Vid = 0x04D8;
-            //_Pid = 0xF08E;
             TxCount = 0;
             TxFailedCount = 0;
             RxCount = 0;
             RxFailedCount = 0;
             PendingCommands = new List<UsbCommand>();
-            LastCommand = 0x12;
+            PacketsToRequest = new List<byte>();
+            PacketsToRequest.Add(0x10);
+            PacketsToRequest.Add(0x11);
+            PacketsToRequest.Add(0x12);
+            PacketsToRequest.Add(0x13);
+            WaitingForDevice = false;
             _NewStatusAvailable = false;
             _NewDisplay1Available = false;
             _NewDisplay2Available = false;
@@ -397,7 +492,12 @@ namespace SolarChargerApp
                 RxCount = 0;
                 RxFailedCount = 0;
                 PendingCommands = new List<UsbCommand>();
-                LastCommand = 0x81;
+                PacketsToRequest = new List<byte>();
+                PacketsToRequest.Add(0x10);
+                PacketsToRequest.Add(0x11);
+                PacketsToRequest.Add(0x12);
+                PacketsToRequest.Add(0x13);
+                WaitingForDevice = false;
             }
         }
 
@@ -412,28 +512,20 @@ namespace SolarChargerApp
             OutBuffer.buffer[0] = 0x00;
 
             //Prepare data to send
-            switch (LastCommand)
+            byte NextPacket;
+            if (PacketsToRequest.Count >= 1)
             {
-                case 0x10:
-                    OutBuffer.buffer[1] = 0x11;
-                    LastCommand = 0x11;
-                    break;
-                case 0x11:
-                    OutBuffer.buffer[1] = 0x12;
-                    LastCommand = 0x12;
-                    break;
-                case 0x12:
-                    OutBuffer.buffer[1] = 0x10;
-                    LastCommand = 0x10;
-                    break;
-                default:
-                    OutBuffer.buffer[1] = 0x10;
-                    LastCommand = 0x10;
-                    break;
-            };
+                NextPacket = PacketsToRequest[0];
+                PacketsToRequest.RemoveAt(0);
+            }     
+            else
+            {
+                NextPacket = 0x10;
+            }       
+            OutBuffer.buffer[1] = NextPacket;
+            PacketsToRequest.Add(NextPacket);
 
             int position = 2;
-            
             while ((position<=64) && (PendingCommands.Count>0))
             {
                 List<byte> CommandBytes = PendingCommands[0].GetByteList();
@@ -497,6 +589,10 @@ namespace SolarChargerApp
                     break;
                 case 0x12:
                     ParseDisplay2(ref InBuffer);
+                    break;
+                case 0x13:
+                    InputVoltageCalibration = new Calibration(InBuffer.buffer, 2);
+                    //ParseDisplay2(ref InBuffer);
                     break;
             };
 

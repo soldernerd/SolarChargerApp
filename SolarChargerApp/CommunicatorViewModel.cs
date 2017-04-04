@@ -1366,7 +1366,7 @@ namespace SolarChargerApp
 
         public string CalibrationInputVoltageOffsetTxt
         {
-            get { return string.Format("{0:D}", communicator.CalibrationInputVoltageOffset); }
+            get { return string.Format("{0:D}", communicator.InputVoltageCalibration.Shift); }
             set
             {
                 Int16 new_value = Int16.Parse(value);
@@ -1378,7 +1378,7 @@ namespace SolarChargerApp
 
         public string CalibrationInputVoltageSlopeCorrectionTxt
         {
-            get { return string.Format("{0:F6}", communicator.CalibrationInputVoltageSlopeCorrection); }
+            get { return string.Format("{0} {1} {2:F6}", communicator.InputVoltageCalibration.Multiplier, communicator.InputVoltageCalibration.Shift, communicator.InputVoltageCalibration.Slope); }
             set
             {
                 float new_value = float.Parse(value);
