@@ -34,14 +34,10 @@ namespace SolarChargerApp
         private bool _SynchronousMode = false;
         private int _WindowPositionX;
         private int _WindowPositionY;
-
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         public CommunicatorViewModel()
         {
-            //Vid = 0x04D8;
-            //_Pid = 0xF08E;
             config = new ConfigFile("config.xml");
             _WindowPositionX = config.PositionX;
             _WindowPositionY = config.PositionY;

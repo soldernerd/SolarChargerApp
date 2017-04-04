@@ -25,9 +25,24 @@ namespace SolarChargerApp
     /// </summary>
     public partial class MainWindow : Window
     {
+        CalibrationWindow CalibrationWin;
+        DeviceWindow DeviceWin;
+
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void WindowClose(object sender, EventArgs e)
+        {
+            if(DeviceWin != null)
+            {
+                DeviceWin.Close();
+            }
+            if(CalibrationWin != null)
+            {
+                CalibrationWin.Close();
+            }
         }
 
         private void FreezeWindowSize(object sender, EventArgs e)
@@ -146,16 +161,24 @@ namespace SolarChargerApp
 
         private void menu_window_device(object sender, EventArgs e)
         {
-            DeviceWindow subWindow = new DeviceWindow(this);
-            //InitializeComponent();
-            subWindow.Show();
+            if (DeviceWin == null)
+            {
+                DeviceWin = new DeviceWindow(this);
+            }
+            DeviceWin.Show();
+            DeviceWin.WindowState = WindowState.Normal;
+            DeviceWin.Focus();
         }
 
         private void menu_window_calibration(object sender, EventArgs e)
         {
-            CalibrationWindow subWindow = new CalibrationWindow(this);
-            //InitializeComponent();
-            subWindow.Show();
+            if (CalibrationWin == null)
+            {
+                CalibrationWin = new CalibrationWindow(this);
+            }
+            CalibrationWin.Show();
+            CalibrationWin.WindowState = WindowState.Normal;
+            CalibrationWin.Focus();
         }
     }
 }

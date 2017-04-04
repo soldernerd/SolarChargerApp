@@ -11,6 +11,7 @@
         SourceInitialized="FreezeWindowSize"
         SizeChanged="FreezeWindowSize"
         SizeToContent="WidthAndHeight"
+        Closing="WindowClose"
         WindowState="Normal"
         ResizeMode="CanResize"
         Left="{Binding WindowPositionX, Mode=TwoWay}"
