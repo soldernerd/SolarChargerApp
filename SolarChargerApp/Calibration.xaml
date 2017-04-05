@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:SolarChargerApp"
         mc:Ignorable="d"
         Title="Calibration" 
+        Closing="CalibrationWindowClose"
         SizeToContent="WidthAndHeight"
         WindowState="Normal"
         ResizeMode="CanMinimize">
@@ -14,14 +15,14 @@
         <StaticResourceExtension ResourceKey="CommunicatorVM"/>
     </Window.DataContext>
 
-    <Grid Height="600" Width="600" Margin="10,10,10,10">
+    <Grid Height="800" Width="600" Margin="10,10,10,10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="2*" />
-            <RowDefinition Height="2*" />
+            <RowDefinition Height="180" />
+            <RowDefinition Height="180" />
             <RowDefinition Height="2*" />
             <RowDefinition Height="2*" />
             <RowDefinition Height="1*" />
@@ -35,24 +36,29 @@
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="4*" />
+                    <RowDefinition Height="4*" />
+                    <RowDefinition Height="3*" />
+                    <RowDefinition Height="3*" />
                 </Grid.RowDefinitions>
                 <!-- Row 0-->
-                <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,10,0" VerticalAlignment="Center" Text="Neutral slope: 123.456"/>
+                <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="0,3" TextWrapping="Wrap"
+                    Text="{Binding CalibrationInputVoltageNeutralTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
                 <!-- Row 1-->
-                <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center">Offset:</TextBlock>
-                <TextBox Grid.Column="1" Grid.Row="1" 
-                    Name="InputVoltageOffset_Textbox" 
-                    Text="{Binding CalibrationInputVoltageOffsetTxt, Mode=TwoWay, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" 
-                    IsEnabled="True" MaxLength="6" Background="WhiteSmoke" Margin="0,3"/>
+                <TextBlock Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,3" TextWrapping="Wrap"
+                    Text="{Binding CalibrationInputVoltageActualTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
                 <!-- Row 2-->
-                <TextBlock Grid.Column="0" Grid.Row="2" Text="Slope correction:" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center">Offset correction:</TextBlock>
                 <TextBox Grid.Column="1" Grid.Row="2" 
+                    Name="InputVoltageOffset_Textbox" 
+                    Text="{Binding CalibrationInputVoltageOffsetCorrectionTxt, Mode=TwoWay, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" 
+                    IsEnabled="True" MaxLength="15" Background="WhiteSmoke" Margin="0,3"/>
+                <!-- Row 3-->
+                <TextBlock Grid.Column="0" Grid.Row="3" Text="Slope correction:" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Grid.Row="3" 
                     Name="InputVoltageSlope_Textbox" 
                     Text="{Binding CalibrationInputVoltageSlopeCorrectionTxt, Mode=TwoWay, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" 
-                    IsEnabled="True" MaxLength="6" Background="WhiteSmoke" Margin="0,3"/>
+                    IsEnabled="True" MaxLength="15" Background="WhiteSmoke" Margin="0,3"/>
             </Grid>
         </GroupBox>
 
@@ -63,53 +69,62 @@
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="4*" />
+                    <RowDefinition Height="4*" />
+                    <RowDefinition Height="3*" />
+                    <RowDefinition Height="3*" />
                 </Grid.RowDefinitions>
                 <!-- Row 0-->
-                <!-- Row 0-->
-                <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,10,0" VerticalAlignment="Center" Text="Neutral slope: 123.456"/>
+                <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="0,3" TextWrapping="Wrap"
+                    Text="{Binding CalibrationOutputVoltageNeutralTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
                 <!-- Row 1-->
-                <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center">Offset:</TextBlock>
-                <TextBox Grid.Column="1" Grid.Row="1" 
-                    Name="OutputVoltageOffset_Textbox" 
-                    Text="{Binding CalibrationOutputVoltageOffsetTxt, Mode=TwoWay, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" 
-                    IsEnabled="True" MaxLength="6" Background="WhiteSmoke" Margin="0,3"/>
+                <TextBlock Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,3" TextWrapping="Wrap"
+                    Text="{Binding CalibrationOutputVoltageActualTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
                 <!-- Row 2-->
-                <TextBlock Grid.Column="0" Grid.Row="2" Text="Slope correction:" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center">Offset correction:</TextBlock>
                 <TextBox Grid.Column="1" Grid.Row="2" 
+                    Name="OutputVoltageOffset_Textbox" 
+                    Text="{Binding CalibrationOutputVoltageOffsetCorrectionTxt, Mode=TwoWay, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" 
+                    IsEnabled="True" MaxLength="15" Background="WhiteSmoke" Margin="0,3"/>
+                <!-- Row 3-->
+                <TextBlock Grid.Column="0" Grid.Row="3" Text="Slope correction:" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Grid.Row="3" 
                     Name="OutputVoltageSlope_Textbox" 
                     Text="{Binding CalibrationOutputVoltageSlopeCorrectionTxt, Mode=TwoWay, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" 
-                    IsEnabled="True" MaxLength="6" Background="WhiteSmoke" Margin="0,3"/>
+                    IsEnabled="True" MaxLength="15" Background="WhiteSmoke" Margin="0,3"/>
             </Grid>
         </GroupBox>
 
-        <GroupBox Header="Output Current" Grid.Column="0" Grid.Row="1" Margin="10,10,10,10">
+        <GroupBox Header="Input Current" Grid.Column="0" Grid.Row="1" Margin="10,10,10,10">
             <Grid Margin="10,10,10,10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="4*" />
+                    <RowDefinition Height="4*" />
+                    <RowDefinition Height="3*" />
+                    <RowDefinition Height="3*" />
                 </Grid.RowDefinitions>
                 <!-- Row 0-->
-                <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,10,0" VerticalAlignment="Center" Text="Neutral slope: 123.456"/>
+                <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="0,3" TextWrapping="Wrap"
+                    Text="{Binding CalibrationInputCurrentNeutralTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
                 <!-- Row 1-->
-                <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center">Offset:</TextBlock>
-                <TextBox Grid.Column="1" Grid.Row="1" 
-                        Name="InputCurrentOffset_Textbox" 
-                        Text="{Binding CalibrationInputCurrentOffsetTxt, Mode=TwoWay, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" 
-                        IsEnabled="True" MaxLength="6" Background="WhiteSmoke" Margin="0,3"/>
+                <TextBlock Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,3" TextWrapping="Wrap"
+                    Text="{Binding CalibrationInputCurrentActualTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
                 <!-- Row 2-->
-                <TextBlock Grid.Column="0" Grid.Row="2" Text="Slope correction:" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center">Offset correction:</TextBlock>
                 <TextBox Grid.Column="1" Grid.Row="2" 
-                        Name="InputCurrentSlope_Textbox" 
-                        Text="{Binding CalibrationInputCurrentSlopeCorrectionTxt, Mode=TwoWay, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" 
-                        IsEnabled="True" MaxLength="6" Background="WhiteSmoke" Margin="0,3"/>
+                    Name="InputCurrentOffset_Textbox" 
+                    Text="{Binding CalibrationInputCurrentOffsetCorrectionTxt, Mode=TwoWay, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" 
+                    IsEnabled="True" MaxLength="15" Background="WhiteSmoke" Margin="0,3"/>
+                <!-- Row 3-->
+                <TextBlock Grid.Column="0" Grid.Row="3" Text="Slope correction:" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Grid.Row="3" 
+                    Name="InputCurrentSlope_Textbox" 
+                    Text="{Binding CalibrationInputCurrentSlopeCorrectionTxt, Mode=TwoWay, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" 
+                    IsEnabled="True" MaxLength="15" Background="WhiteSmoke" Margin="0,3"/>
             </Grid>
         </GroupBox>
 
@@ -120,52 +135,29 @@
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="4*" />
+                    <RowDefinition Height="4*" />
+                    <RowDefinition Height="3*" />
+                    <RowDefinition Height="3*" />
                 </Grid.RowDefinitions>
                 <!-- Row 0-->
-                <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,10,0" VerticalAlignment="Center" Text="Neutral slope: 123.456"/>
+                <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="0,3" TextWrapping="Wrap"
+                    Text="{Binding CalibrationOutputCurrentNeutralTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
                 <!-- Row 1-->
-                <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center">Offset:</TextBlock>
-                <TextBox Grid.Column="1" Grid.Row="1" 
-                    Name="OutputCurrentOffset_Textbox" 
-                    Text="{Binding CalibrationOutputCurrentOffsetTxt, Mode=TwoWay, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" 
-                    IsEnabled="True" MaxLength="6" Background="WhiteSmoke" Margin="0,3"/>
+                <TextBlock Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,3" TextWrapping="Wrap"
+                    Text="{Binding CalibrationOutputCurrentActualTxt, Mode=OneWay, Source={StaticResource CommunicatorVM}}"/>
                 <!-- Row 2-->
-                <TextBlock Grid.Column="0" Grid.Row="2" Text="Slope correction:" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center">Offset correction:</TextBlock>
                 <TextBox Grid.Column="1" Grid.Row="2" 
+                    Name="OutputCurrentOffset_Textbox" 
+                    Text="{Binding CalibrationOutputCurrentOffsetCorrectionTxt, Mode=TwoWay, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" 
+                    IsEnabled="True" MaxLength="15" Background="WhiteSmoke" Margin="0,3"/>
+                <!-- Row 3-->
+                <TextBlock Grid.Column="0" Grid.Row="3" Text="Slope correction:" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" Grid.Row="3" 
                     Name="OutputCurrentSlope_Textbox" 
                     Text="{Binding CalibrationOutputCurrentSlopeCorrectionTxt, Mode=TwoWay, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" 
-                    IsEnabled="True" MaxLength="6" Background="WhiteSmoke" Margin="0,3"/>
-            </Grid>
-        </GroupBox>
-
-        <GroupBox Header="On-board Temperature" Grid.Column="0" Grid.Row="2" Margin="10,10,10,10">
-            <Grid Margin="10,10,10,10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="1*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
-                </Grid.RowDefinitions>
-                <!-- Row 0-->
-                <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,10,0" VerticalAlignment="Center" Text="Neutral slope: 123.456"/>
-                <!-- Row 1-->
-                <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center">Offset:</TextBlock>
-                <TextBox Grid.Column="1" Grid.Row="1" 
-                    Name="OnboardTemperatureOffset_Textbox" 
-                    Text="{Binding CalibrationOnboardTemperatureOffsetTxt, Mode=TwoWay, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" 
-                    IsEnabled="True" MaxLength="6" Background="WhiteSmoke" Margin="0,3"/>
-                <!-- Row 2-->
-                <TextBlock Grid.Column="0" Grid.Row="2" Text="Slope correction:" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Grid.Row="2" 
-                    Name="OnboardTemperatureSlope_Textbox" 
-                    Text="{Binding CalibrationOnboardTemperatureSlopeCorrectionTxt, Mode=TwoWay, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" 
-                    IsEnabled="True" MaxLength="6" Background="WhiteSmoke" Margin="0,3"/>
+                    IsEnabled="True" MaxLength="15" Background="WhiteSmoke" Margin="0,3"/>
             </Grid>
         </GroupBox>
 

@@ -26,6 +26,11 @@ namespace SolarChargerApp
             parentWindow = mainWin;
         }
 
+        private void DeviceWindowClose(object sender, EventArgs e)
+        {
+            parentWindow.DeviceWin = null;
+        }
+
         private void PidVidSave_Click(object sender, EventArgs e)
         {
             this.Pid_TextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();

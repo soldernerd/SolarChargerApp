@@ -25,8 +25,8 @@ namespace SolarChargerApp
     /// </summary>
     public partial class MainWindow : Window
     {
-        CalibrationWindow CalibrationWin;
-        DeviceWindow DeviceWin;
+        public CalibrationWindow CalibrationWin;
+        public DeviceWindow DeviceWin;
 
         public MainWindow()
         {

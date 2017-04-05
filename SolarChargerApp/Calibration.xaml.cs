@@ -26,6 +26,11 @@ namespace SolarChargerApp
             parentWindow = mainWin;
         }
 
+        private void CalibrationWindowClose(object sender, EventArgs e)
+        {
+            parentWindow.CalibrationWin = null;
+        }
+
         private void SaveCalibration_Click(object sender, EventArgs e)
         {
             this.InputVoltageOffset_Textbox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
@@ -36,6 +41,7 @@ namespace SolarChargerApp
             this.InputCurrentSlope_Textbox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
             this.OutputCurrentOffset_Textbox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
             this.OutputCurrentSlope_Textbox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+            /*
             this.OnboardTemperatureOffset_Textbox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
             this.OnboardTemperatureSlope_Textbox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
             this.ExternalTemperature1Offset_Textbox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
@@ -43,6 +49,7 @@ namespace SolarChargerApp
             this.ExternalTemperature2Offset_Textbox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
             this.ExternalTemperature2Slope_Textbox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
             this.RealTimeClock_Textbox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+            */
         }
 
     }

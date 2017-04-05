@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:SolarChargerApp"
         mc:Ignorable="d"
         Title="USB Device Configuration" 
+        Closing="DeviceWindowClose"
         SizeToContent="WidthAndHeight"
         WindowState="Normal"
         ResizeMode="CanMinimize">
@@ -24,7 +25,6 @@
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
 
-        
         <GroupBox Header="Vid" Grid.Column="0" Grid.Row="0" Width="80" Height="45" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,10,10">
             <TextBox Name="Vid_TextBox" Text="{Binding VidTxt, Mode=TwoWay, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" IsEnabled="True" MaxLength="6" Background="WhiteSmoke" Width="60" Height="20"/>
         </GroupBox>

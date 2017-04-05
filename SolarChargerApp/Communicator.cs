@@ -88,6 +88,11 @@ namespace SolarChargerApp
         public Int16 CalibrationRealTimeClock { get; private set; }
 
         public Calibration InputVoltageCalibration { get; private set; }
+        public Calibration OutputVoltageCalibration { get; private set; }
+        public Calibration InputCurrentCalibration { get; private set; }
+        public Calibration OutputCurrentCalibration { get; private set; }
+
+        public string DebugString { get; private set; }
 
         public class UsbCommand
         {
@@ -98,6 +103,22 @@ namespace SolarChargerApp
             {
                 this.command = command;
                 this.data = new List<byte>();
+            }
+
+            public UsbCommand(byte command, List<byte> data)
+            {
+                this.command = command;
+                this.data = data;
+            }
+
+            public UsbCommand(byte command, byte d1, byte d2, byte d3, byte d4)
+            {
+                this.command = command;
+                this.data = new List<byte>();
+                this.data.Add(d1);
+                this.data.Add(d2);
+                this.data.Add(d3);
+                this.data.Add(d4);
             }
 
             public UsbCommand(byte command, byte data)
@@ -198,21 +219,18 @@ namespace SolarChargerApp
             private ScaleParameters scale(float factor)
             {
                 Int16 multiplier;
-                byte shift;
-
-                shift = 0;
-                while (Math.Abs(factor) < (2 ^ 15 - 1))
+                byte shift = 0;
+                while (Math.Abs(2*factor) < Int16.MaxValue)
                 {
                     ++shift;
                     factor *= 2;
                 }
-                multiplier = (Int16)Math.Round(factor);
+                multiplier = (Int16) Math.Round(factor);
                 while (multiplier % 2 == 0)
                 {
                     --shift;
                     multiplier /= 2;
                 }
-
                 return new ScaleParameters(multiplier, shift);
             }
 
@@ -220,7 +238,7 @@ namespace SolarChargerApp
             {
                 get
                 {
-                    return ((float)NeutralMultiplier) / (2 ^ NeutralShift);
+                    return (float) NeutralMultiplier / (float) Math.Pow(2,NeutralShift);
                 }
             }
 
@@ -228,13 +246,29 @@ namespace SolarChargerApp
             {
                 get
                 {
-                    return ((float)Multiplier) / ((float)Math.Pow(2, Shift));
+                    return (float) Multiplier / (float) Math.Pow(2, Shift);
                 }
                 set
                 {
                     ScaleParameters parameters = scale(value);
                     Multiplier = parameters.Multiplier;
                     Shift = parameters.Shift;
+                }
+            }
+
+            public Int16 OffsetCorrection
+            {
+                get
+                {
+                    return (Int16) (this.Offset - this.NeutralOffset);
+                }
+                set
+                {
+                    if (value < -100)
+                        value = -100;
+                    if (value > 100)
+                        value = 100;
+                    Offset = (Int16) (value - this.NeutralOffset);
                 }
             }
 
@@ -246,9 +280,14 @@ namespace SolarChargerApp
                 }
                 set
                 {
-                    ScaleParameters parameters = scale(value * NeutralSlope);
-                    Multiplier = parameters.Multiplier;
-                    Shift = parameters.Shift;
+                    if (value != 0)
+                    {
+                        if (Math.Abs(value) < 0.95)
+                            value = (float) 0.95 * Math.Sign(value);
+                        if (Math.Abs(value) > 1.05)
+                            value = (float) 1.05 * Math.Sign(value);
+                        this.Slope = value * this.NeutralSlope;
+                    }
                 }
             }
         } // End of Calibration
@@ -258,6 +297,7 @@ namespace SolarChargerApp
         private bool _NewStatusAvailable;
         private bool _NewDisplay1Available;
         private bool _NewDisplay2Available;
+        private bool _NewCalibrationAvailable;
 
         public Communicator()
         {
@@ -276,6 +316,7 @@ namespace SolarChargerApp
             _NewStatusAvailable = false;
             _NewDisplay1Available = false;
             _NewDisplay2Available = false;
+            _NewCalibrationAvailable = false;
 
             // Obtain and initialize an instance of HidUtility
             HidUtil = new HidUtility();  
@@ -335,6 +376,22 @@ namespace SolarChargerApp
                 {
                     _NewDisplay1Available = false;
                     _NewDisplay2Available = false;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        public bool NewCalibrationAvailable
+        {
+            get
+            {
+                if (_NewCalibrationAvailable)
+                {
+                    _NewCalibrationAvailable = false;
                     return true;
                 }
                 else
@@ -442,6 +499,17 @@ namespace SolarChargerApp
             _NewDisplay2Available = true;
         }
 
+        //Function to parse packet received over USB
+        private void ParseCalibration1(ref UsbBuffer InBuffer)
+        {
+            InputVoltageCalibration = new Calibration(InBuffer.buffer, 2);
+            OutputVoltageCalibration = new Calibration(InBuffer.buffer, 14);
+            InputCurrentCalibration = new Calibration(InBuffer.buffer, 26);
+            OutputCurrentCalibration = new Calibration(InBuffer.buffer, 38);
+            //New calibration is now available
+            _NewCalibrationAvailable = true;
+        }
+
         // Accessor for _Vid
         // Only update selected device if the value has actually changed
         public ushort Vid
@@ -487,6 +555,10 @@ namespace SolarChargerApp
             if (e.ConnectionStatus != HidUtility.UsbConnectionStatus.Connected)
             {
                 // Reset variables
+                _NewStatusAvailable = false;
+                _NewDisplay1Available = false;
+                _NewDisplay2Available = false;
+                _NewCalibrationAvailable = false;
                 TxCount = 0;
                 TxFailedCount = 0;
                 RxCount = 0;
@@ -504,7 +576,8 @@ namespace SolarChargerApp
         // HidUtility asks if a packet should be sent to the device
         // Prepare the buffer and request a transfer
         public void SendPacketHandler(object sender, UsbBuffer OutBuffer)
-        { 
+        {
+            DebugString = "Start SendPacketHandler";
             // Fill entire buffer with 0xFF
             OutBuffer.clear();
 
@@ -549,12 +622,14 @@ namespace SolarChargerApp
 
             //Request the packet to be sent over the bus
             OutBuffer.RequestTransfer = true;
+            DebugString = "End SendPacketHandler";
         }
 
         // HidUtility informs us if the requested transfer was successful
         // Schedule to request a packet if the transfer was successful
         public void PacketSentHandler(object sender, UsbBuffer OutBuffer)
         {
+            DebugString = "Start PacketSentHandler";
             WaitingForDevice = OutBuffer.TransferSuccessful;
             if (OutBuffer.TransferSuccessful)
             {
@@ -564,18 +639,22 @@ namespace SolarChargerApp
             {
                 ++TxFailedCount;
             }
+            DebugString = "End PacketSentHandler";
         }
 
         // HidUtility asks if a packet should be requested from the device
         // Request a packet if a packet has been successfully sent to the device before
         public void ReceivePacketHandler(object sender, UsbBuffer InBuffer)
         {
+            DebugString = "Start ReceivePacketHandler";
             InBuffer.RequestTransfer = WaitingForDevice;
+            DebugString = "End ReceivePacketHandler";
         }
 
         // HidUtility informs us if the requested transfer was successful and provides us with the received packet
         public void PacketReceivedHandler(object sender, UsbBuffer InBuffer)
         {
+            DebugString = "Start PacketReceivedHandler";
             WaitingForDevice = false;
 
             //Parse received data
@@ -591,8 +670,7 @@ namespace SolarChargerApp
                     ParseDisplay2(ref InBuffer);
                     break;
                 case 0x13:
-                    InputVoltageCalibration = new Calibration(InBuffer.buffer, 2);
-                    //ParseDisplay2(ref InBuffer);
+                    ParseCalibration1(ref InBuffer);
                     break;
             };
 
@@ -605,6 +683,7 @@ namespace SolarChargerApp
             {
                 ++RxFailedCount;
             }
+            DebugString = "End PacketReceivedHandler";
         }
 
 
@@ -790,22 +869,63 @@ namespace SolarChargerApp
 
         public enum CalibrationItem: byte
         {
-            InputVoltageSlope = 0x60,
-            InputVoltageOffset = 0x61,
-            OutputVoltageSlope = 0x62,
-            OutputVoltageOffset = 0x63,
-            InputCurrentSlope = 0x64,
-            InputCurrentOffset = 0x65,
-            OutputCurrentSlope = 0x66,
-            OutputCurrentOffset = 0x67,
-            OnboardTemperatureSlope = 0x68,
-            OnboardTemperatureOffset = 0x69,
-            ExternalTemperature1Slope = 0x6A,
-            ExternalTemperature1Offset = 0x6B,
-            ExternalTemperature2Slope = 0x6C,
-            ExternalTemperature2Offset = 0x6D
+            InputVoltageOffset = 0x00,
+            InputVoltageSlope = 0x01,
+            OutputVoltageOffset = 0x10,
+            OutputVoltageSlope = 0x11,
+            InputCurrentOffset = 0x20,
+            InputCurrentSlope = 0x21,
+            OutputCurrentOffset = 0x30,
+            OutputCurrentSlope = 0x31,
+            OnboardTemperatureOffset = 0x40,
+            OnboardTemperatureSlope = 0x41,
+            ExternalTemperature1Offset = 0x50,
+            ExternalTemperature1Slope = 0x51,
+            ExternalTemperature2Offset = 0x60,
+            ExternalTemperature2Slope = 0x61
         }
 
+        //Calibration in general
+        public void SetCalibration(CalibrationItem item)
+        {
+            Calibration cal;
+            UsbCommand cmd = new UsbCommand(0xFF);
+            //Get calibration object
+            switch ((byte)item & 0xF0)
+            {
+                case 0x00:
+                    cal = this.InputVoltageCalibration;
+                    break;
+                case 0x10:
+                    cal = this.OutputVoltageCalibration;
+                    break;
+                case 0x20:
+                    cal = this.InputCurrentCalibration;
+                    break;
+                case 0x30:
+                    cal = this.OutputCurrentCalibration;
+                    break;
+                default:
+                    cal = this.InputVoltageCalibration;
+                    break;
+            }
+            //Assemble command
+            switch ((byte) item & 0x0F)
+            {
+                case 0x00:
+                    byte[] offset = BitConverter.GetBytes(cal.Offset);
+                    cmd = new UsbCommand(0x60, (byte) item, offset[1], offset[0], 0x00);
+                    break;
+                case 0x01:
+                    byte[] multiplier = BitConverter.GetBytes(cal.Multiplier);
+                    cmd = new UsbCommand(0x60, (byte)item, multiplier[1], multiplier[0], cal.Shift);
+                    break;
+            }
+            //Add command to cue
+            PendingCommands.Add(cmd);          
+        }
+
+        /*
         //Calibrating slope
         public void SetCalibration(CalibrationItem item, float value)
         {
@@ -819,6 +939,7 @@ namespace SolarChargerApp
             UsbCommand cmd = new UsbCommand((byte) item, value);
             PendingCommands.Add(cmd);
         }
+        */
 
         public void SetRealTimeClockCalibration(Int16 calibration)
         {
