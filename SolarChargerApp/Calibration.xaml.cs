@@ -24,6 +24,7 @@ namespace SolarChargerApp
         {
             InitializeComponent();
             parentWindow = mainWin;
+            this.MaxHeight = SystemParameters.VirtualScreenHeight-50;
         }
 
         private void CalibrationWindowClose(object sender, EventArgs e)
@@ -41,15 +42,13 @@ namespace SolarChargerApp
             this.InputCurrentSlope_Textbox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
             this.OutputCurrentOffset_Textbox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
             this.OutputCurrentSlope_Textbox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
-            /*
+
             this.OnboardTemperatureOffset_Textbox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
             this.OnboardTemperatureSlope_Textbox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
             this.ExternalTemperature1Offset_Textbox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
             this.ExternalTemperature1Slope_Textbox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
             this.ExternalTemperature2Offset_Textbox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
             this.ExternalTemperature2Slope_Textbox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
-            this.RealTimeClock_Textbox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
-            */
         }
 
     }

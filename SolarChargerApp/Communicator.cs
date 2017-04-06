@@ -91,6 +91,9 @@ namespace SolarChargerApp
         public Calibration OutputVoltageCalibration { get; private set; }
         public Calibration InputCurrentCalibration { get; private set; }
         public Calibration OutputCurrentCalibration { get; private set; }
+        public Calibration OnboardTemperatureCalibration { get; private set; }
+        public Calibration ExternalTemperature1Calibration { get; private set; }
+        public Calibration ExternalTemperature2Calibration { get; private set; }
 
         public string DebugString { get; private set; }
 
@@ -268,7 +271,7 @@ namespace SolarChargerApp
                         value = -100;
                     if (value > 100)
                         value = 100;
-                    Offset = (Int16) (value - this.NeutralOffset);
+                    Offset = (Int16) (value + this.NeutralOffset);
                 }
             }
 
@@ -280,14 +283,11 @@ namespace SolarChargerApp
                 }
                 set
                 {
-                    if (value != 0)
-                    {
-                        if (Math.Abs(value) < 0.95)
-                            value = (float) 0.95 * Math.Sign(value);
-                        if (Math.Abs(value) > 1.05)
-                            value = (float) 1.05 * Math.Sign(value);
-                        this.Slope = value * this.NeutralSlope;
-                    }
+                    if (value < 0.95)
+                        value = (float) 0.95;
+                    if (value > 1.05)
+                        value = (float) 1.05;
+                    this.Slope = value * this.NeutralSlope;
                 }
             }
         } // End of Calibration
@@ -297,7 +297,8 @@ namespace SolarChargerApp
         private bool _NewStatusAvailable;
         private bool _NewDisplay1Available;
         private bool _NewDisplay2Available;
-        private bool _NewCalibrationAvailable;
+        private bool _NewCalibration1Available;
+        private bool _NewCalibration2Available;
 
         public Communicator()
         {
@@ -312,11 +313,13 @@ namespace SolarChargerApp
             PacketsToRequest.Add(0x11);
             PacketsToRequest.Add(0x12);
             PacketsToRequest.Add(0x13);
+            PacketsToRequest.Add(0x14);
             WaitingForDevice = false;
             _NewStatusAvailable = false;
             _NewDisplay1Available = false;
             _NewDisplay2Available = false;
-            _NewCalibrationAvailable = false;
+            _NewCalibration1Available = false;
+            _NewCalibration2Available = false;
 
             // Obtain and initialize an instance of HidUtility
             HidUtil = new HidUtility();  
@@ -389,9 +392,10 @@ namespace SolarChargerApp
         {
             get
             {
-                if (_NewCalibrationAvailable)
+                if (_NewCalibration1Available && _NewCalibration2Available)
                 {
-                    _NewCalibrationAvailable = false;
+                    _NewCalibration1Available = false;
+                    _NewCalibration2Available = false;
                     return true;
                 }
                 else
@@ -507,7 +511,17 @@ namespace SolarChargerApp
             InputCurrentCalibration = new Calibration(InBuffer.buffer, 26);
             OutputCurrentCalibration = new Calibration(InBuffer.buffer, 38);
             //New calibration is now available
-            _NewCalibrationAvailable = true;
+            _NewCalibration1Available = true;
+        }
+
+        //Function to parse packet received over USB
+        private void ParseCalibration2(ref UsbBuffer InBuffer)
+        {
+            OnboardTemperatureCalibration = new Calibration(InBuffer.buffer, 2);
+            ExternalTemperature1Calibration = new Calibration(InBuffer.buffer, 14);
+            ExternalTemperature2Calibration = new Calibration(InBuffer.buffer, 26);
+            //New calibration is now available
+            _NewCalibration2Available = true;
         }
 
         // Accessor for _Vid
@@ -558,7 +572,8 @@ namespace SolarChargerApp
                 _NewStatusAvailable = false;
                 _NewDisplay1Available = false;
                 _NewDisplay2Available = false;
-                _NewCalibrationAvailable = false;
+                _NewCalibration1Available = false;
+                _NewCalibration2Available = false;
                 TxCount = 0;
                 TxFailedCount = 0;
                 RxCount = 0;
@@ -569,6 +584,7 @@ namespace SolarChargerApp
                 PacketsToRequest.Add(0x11);
                 PacketsToRequest.Add(0x12);
                 PacketsToRequest.Add(0x13);
+                PacketsToRequest.Add(0x14);
                 WaitingForDevice = false;
             }
         }
@@ -671,6 +687,9 @@ namespace SolarChargerApp
                     break;
                 case 0x13:
                     ParseCalibration1(ref InBuffer);
+                    break;
+                case 0x14:
+                    ParseCalibration2(ref InBuffer);
                     break;
             };
 
@@ -904,6 +923,15 @@ namespace SolarChargerApp
                     break;
                 case 0x30:
                     cal = this.OutputCurrentCalibration;
+                    break;
+                case 0x40:
+                    cal = this.OnboardTemperatureCalibration;
+                    break;
+                case 0x50:
+                    cal = this.ExternalTemperature1Calibration;
+                    break;
+                case 0x60:
+                    cal = this.ExternalTemperature2Calibration;
                     break;
                 default:
                     cal = this.InputVoltageCalibration;

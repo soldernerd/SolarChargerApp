@@ -221,11 +221,11 @@ namespace SolarChargerApp
                 PropertyChanged(this, new PropertyChangedEventArgs("CalibrationOutputCurrentOffsetCorrectionTxt"));
                 PropertyChanged(this, new PropertyChangedEventArgs("CalibrationOutputCurrentSlopeCorrectionTxt"));
 
-                PropertyChanged(this, new PropertyChangedEventArgs("CalibrationOnboardTemperatureOffsetTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("CalibrationOnboardTemperatureOffsetCorrectionTxt"));
                 PropertyChanged(this, new PropertyChangedEventArgs("CalibrationOnboardTemperatureSlopeCorrectionTxt"));
-                PropertyChanged(this, new PropertyChangedEventArgs("CalibrationExternalTemperature1OffsetTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("CalibrationExternalTemperature1OffsetCorrectionTxt"));
                 PropertyChanged(this, new PropertyChangedEventArgs("CalibrationExternalTemperature1SlopeCorrectionTxt"));
-                PropertyChanged(this, new PropertyChangedEventArgs("CalibrationExternalTemperature2OffsetTxt"));
+                PropertyChanged(this, new PropertyChangedEventArgs("CalibrationExternalTemperature2OffsetCorrectionTxt"));
                 PropertyChanged(this, new PropertyChangedEventArgs("CalibrationExternalTemperature2SlopeCorrectionTxt"));
                 PropertyChanged(this, new PropertyChangedEventArgs("CalibrationRealTimeClockTxt"));
                 PropertyChanged(this, new PropertyChangedEventArgs("ActivityLogTxt"));
@@ -507,12 +507,18 @@ namespace SolarChargerApp
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("CalibrationInputVoltageNeutralTxt"));
                     PropertyChanged(this, new PropertyChangedEventArgs("CalibrationInputVoltageActualTxt"));
-                    //PropertyChanged(this, new PropertyChangedEventArgs("CalibrationInputVoltageOffsetCorrectionTxt"));
-                    //PropertyChanged(this, new PropertyChangedEventArgs("CalibrationInputVoltageSlopeCorrectionTxt"));
                     PropertyChanged(this, new PropertyChangedEventArgs("CalibrationOutputVoltageNeutralTxt"));
                     PropertyChanged(this, new PropertyChangedEventArgs("CalibrationOutputVoltageActualTxt"));
-                    //PropertyChanged(this, new PropertyChangedEventArgs("CalibrationOutputVoltageOffsetCorrectionTxt"));
-                    //PropertyChanged(this, new PropertyChangedEventArgs("CalibrationOutputVoltageSlopeCorrectionTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("CalibrationInputCurrentNeutralTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("CalibrationInputCurrentActualTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("CalibrationOutputCurrentNeutralTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("CalibrationOutputCurrentActualTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("CalibrationOnboardTemperatureNeutralTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("CalibrationOnboardTemperatureActualTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("CalibrationExternalTemperature1NeutralTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("CalibrationExternalTemperature1ActualTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("CalibrationExternalTemperature2NeutralTxt"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("CalibrationExternalTemperature2ActualTxt"));
                 }
 
                 //Update these in any case
@@ -1563,75 +1569,123 @@ namespace SolarChargerApp
             }
         }
 
-        public string CalibrationOnboardTemperatureOffsetTxt
+        public string CalibrationOnboardTemperatureNeutralTxt
         {
-            get { return string.Format("{0:D}", communicator.CalibrationOnboardTemperatureOffset); }
+            get { return GetNeutralCalibrationString(communicator.OnboardTemperatureCalibration, "[0.01°C/count]", false); }
+        }
+
+        public string CalibrationOnboardTemperatureActualTxt
+        {
+            get { return GetActualCalibrationString(communicator.OnboardTemperatureCalibration, "[0.01°C/count]"); }
+        }
+
+        public string CalibrationOnboardTemperatureOffsetCorrectionTxt
+        {
+            get { return string.Format("{0:D}", communicator.OnboardTemperatureCalibration.OffsetCorrection); }
             set
             {
                 Int16 new_value = Int16.Parse(value);
-                if (new_value != communicator.CalibrationOnboardTemperatureOffset)
+                if (new_value != communicator.OnboardTemperatureCalibration.OffsetCorrection)
+                {
+                    communicator.OnboardTemperatureCalibration.OffsetCorrection = new_value;
                     communicator.SetCalibration(Communicator.CalibrationItem.OnboardTemperatureOffset);
-                WriteLog(string.Format("OnboardTemperatureOffset set to : {0:D}", new_value), false);
+                    WriteLog(string.Format("OnboardTemperatureOffsetCorrection set to : {0:D}", new_value), false);
+                }
             }
         }
 
         public string CalibrationOnboardTemperatureSlopeCorrectionTxt
         {
-            get { return string.Format("{0:F6}", communicator.CalibrationOnboardTemperatureSlopeCorrection); }
+            get { return string.Format("{0:F6}", communicator.OnboardTemperatureCalibration.SlopeCorrection); }
             set
             {
                 float new_value = float.Parse(value);
-                if (new_value != communicator.CalibrationOnboardTemperatureSlopeCorrection)
+                if (new_value != communicator.OnboardTemperatureCalibration.SlopeCorrection)
+                {
+                    communicator.OnboardTemperatureCalibration.SlopeCorrection = new_value;
                     communicator.SetCalibration(Communicator.CalibrationItem.OnboardTemperatureSlope);
-                WriteLog(string.Format("OnboardTemperatureSlopeCorrection set to : {0:F6}", new_value), false);
+                    WriteLog(string.Format("OnboardTemperatureSlopeCorrection set to : {0:F6}", new_value), false);
+                }
             }
         }
 
-        public string CalibrationExternalTemperature1OffsetTxt
+        public string CalibrationExternalTemperature1NeutralTxt
         {
-            get { return string.Format("{0:D}", communicator.CalibrationExternalTemperature1Offset); }
+            get { return GetNeutralCalibrationString(communicator.ExternalTemperature1Calibration, "[0.01°C/count]", false); }
+        }
+
+        public string CalibrationExternalTemperature1ActualTxt
+        {
+            get { return GetActualCalibrationString(communicator.ExternalTemperature1Calibration, "[0.01°C/count]"); }
+        }
+
+        public string CalibrationExternalTemperature1OffsetCorrectionTxt
+        {
+            get { return string.Format("{0:D}", communicator.ExternalTemperature1Calibration.OffsetCorrection); }
             set
             {
                 Int16 new_value = Int16.Parse(value);
-                if (new_value != communicator.CalibrationExternalTemperature1Offset)
+                if (new_value != communicator.ExternalTemperature1Calibration.OffsetCorrection)
+                {
+                    communicator.ExternalTemperature1Calibration.OffsetCorrection = new_value;
                     communicator.SetCalibration(Communicator.CalibrationItem.ExternalTemperature1Offset);
-                WriteLog(string.Format("ExternalTemperature1Offset set to : {0:D}", new_value), false);
+                    WriteLog(string.Format("ExternalTemperature1OffsetCorrection set to : {0:D}", new_value), false);
+                }
             }
         }
 
         public string CalibrationExternalTemperature1SlopeCorrectionTxt
         {
-            get { return string.Format("{0:F6}", communicator.CalibrationExternalTemperature1SlopeCorrection); }
+            get { return string.Format("{0:F6}", communicator.ExternalTemperature1Calibration.SlopeCorrection); }
             set
             {
                 float new_value = float.Parse(value);
-                if (new_value != communicator.CalibrationExternalTemperature1SlopeCorrection)
+                if (new_value != communicator.ExternalTemperature1Calibration.SlopeCorrection)
+                {
+                    communicator.ExternalTemperature1Calibration.SlopeCorrection = new_value;
                     communicator.SetCalibration(Communicator.CalibrationItem.ExternalTemperature1Slope);
-                WriteLog(string.Format("ExternalTemperature1SlopeCorrection set to : {0:F6}", new_value), false);
+                    WriteLog(string.Format("ExternalTemperature1SlopeCorrection set to : {0:F6}", new_value), false);
+                }
             }
         }
 
-        public string CalibrationExternalTemperature2OffsetTxt
+        public string CalibrationExternalTemperature2NeutralTxt
         {
-            get { return string.Format("{0:D}", communicator.CalibrationExternalTemperature2Offset); }
+            get { return GetNeutralCalibrationString(communicator.ExternalTemperature2Calibration, "[0.01°C/count]", false); }
+        }
+
+        public string CalibrationExternalTemperature2ActualTxt
+        {
+            get { return GetActualCalibrationString(communicator.ExternalTemperature2Calibration, "[0.01°C/count]"); }
+        }
+
+        public string CalibrationExternalTemperature2OffsetCorrectionTxt
+        {
+            get { return string.Format("{0:D}", communicator.ExternalTemperature2Calibration.OffsetCorrection); }
             set
             {
                 Int16 new_value = Int16.Parse(value);
-                if (new_value != communicator.CalibrationExternalTemperature2Offset)
+                if (new_value != communicator.ExternalTemperature2Calibration.OffsetCorrection)
+                {
+                    communicator.ExternalTemperature2Calibration.OffsetCorrection = new_value;
                     communicator.SetCalibration(Communicator.CalibrationItem.ExternalTemperature2Offset);
-                WriteLog(string.Format("ExternalTemperature2Offset set to : {0:D}", new_value), false);
+                    WriteLog(string.Format("ExternalTemperature2OffsetCorrection set to : {0:D}", new_value), false);
+                }
             }
         }
 
         public string CalibrationExternalTemperature2SlopeCorrectionTxt
         {
-            get { return string.Format("{0:F6}", communicator.CalibrationExternalTemperature2SlopeCorrection); }
+            get { return string.Format("{0:F6}", communicator.ExternalTemperature2Calibration.SlopeCorrection); }
             set
             {
                 float new_value = float.Parse(value);
-                if (new_value != communicator.CalibrationExternalTemperature2SlopeCorrection)
+                if (new_value != communicator.ExternalTemperature2Calibration.SlopeCorrection)
+                {
+                    communicator.ExternalTemperature2Calibration.SlopeCorrection = new_value;
                     communicator.SetCalibration(Communicator.CalibrationItem.ExternalTemperature2Slope);
-                WriteLog(string.Format("ExternalTemperature2SlopeCorrection set to : {0:F6}", new_value), false);
+                    WriteLog(string.Format("ExternalTemperature2SlopeCorrection set to : {0:F6}", new_value), false);
+                }
             }
         }
 
