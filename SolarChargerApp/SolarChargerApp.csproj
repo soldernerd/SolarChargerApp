@@ -129,6 +129,7 @@
     </ApplicationDefinition>
     <Compile Include="Calibration.xaml.cs" />
     <Compile Include="Device.xaml.cs" />
+    <Compile Include="SettingsWindow.xaml.cs" />
     <Page Include="Calibration.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -152,6 +153,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Device.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SettingsWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

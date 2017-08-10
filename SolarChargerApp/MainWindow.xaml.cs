@@ -26,6 +26,7 @@ namespace SolarChargerApp
     public partial class MainWindow : Window
     {
         public CalibrationWindow CalibrationWin;
+        public SettingsWindow SettingsWin;
         public DeviceWindow DeviceWin;
 
         public MainWindow()
@@ -39,7 +40,11 @@ namespace SolarChargerApp
             {
                 DeviceWin.Close();
             }
-            if(CalibrationWin != null)
+            if (SettingsWin != null)
+            {
+                SettingsWin.Close();
+            }
+            if (CalibrationWin != null)
             {
                 CalibrationWin.Close();
             }
@@ -168,6 +173,17 @@ namespace SolarChargerApp
             DeviceWin.Show();
             DeviceWin.WindowState = WindowState.Normal;
             DeviceWin.Focus();
+        }
+
+        private void menu_window_settings(object sender, EventArgs e)
+        {
+            if (SettingsWin == null)
+            {
+                SettingsWin = new SettingsWindow(this);
+            }
+            SettingsWin.Show();
+            SettingsWin.WindowState = WindowState.Normal;
+            SettingsWin.Focus();
         }
 
         private void menu_window_calibration(object sender, EventArgs e)

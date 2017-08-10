@@ -276,13 +276,16 @@
                         <RowDefinition Height="1*" />
                     </Grid.RowDefinitions>
                     <!-- Row 0-->
-                    <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,10,0" VerticalAlignment="Center" Text="Neutral slope: 123.456"/>
+                    <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,10,0" VerticalAlignment="Center" Text="RTC Calibration"/>
                     <!-- Row 1-->
-                    <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center">Offset:</TextBlock>
+                    <ComboBox Name="RtcCalibration_ComboBox" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="10,10,10,10">
+                    </ComboBox>
+                       <!--
                     <TextBox Grid.Column="1" Grid.Row="1" 
                     Name="RealTimeClock_Textbox" 
                     Text="{Binding CalibrationRealTimeClockTxt, Mode=TwoWay, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" 
                     IsEnabled="True" MaxLength="6" Background="WhiteSmoke" Margin="0,3"/>
+                    -->
                 </Grid>
             </GroupBox>
 

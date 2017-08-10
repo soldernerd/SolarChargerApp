@@ -47,6 +47,7 @@
                 <MenuItem Header="Connection Details" Name="MenuItem_ConnectionDetail" Click="ExpandCollapse"></MenuItem>
             </MenuItem>
             <MenuItem Header="Connection" Click="menu_window_device"/>
+            <MenuItem Header="Settings" Click="menu_window_settings"/>
             <MenuItem Header="Calibration" Click="menu_window_calibration"/>
             <MenuItem Header="_About"   Click="menu_window_about"/>
         </Menu>
@@ -244,7 +245,7 @@
 
         <!-- Row 4 , charger and display-->
         <GroupBox Header="Charger Details" Name="ChargerDetails_GroupBox" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" Margin="10,10,10,10"
-            Height="180"
+            Height="190"
             Visibility="{Binding ChargerDisplayVisibility, Mode=TwoWay, Source={StaticResource CommunicatorVM}}">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -267,15 +268,15 @@
                 <CheckBox x:Name="Manual_CheckBox" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                 Content="Manual Control" HorizontalAlignment="Left" Margin="10,10"
                 IsChecked="{Binding ManualControl, Source={StaticResource CommunicatorVM}}"/>
-
-                <CheckBox x:Name="SynchronousMode_CheckBox" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
-                Content="Synchronous Mode" HorizontalAlignment="Left" Margin="10,10"
-                IsChecked="{Binding SynchronousMode, Source={StaticResource CommunicatorVM}}"/>
-                <Button Name="ChargerOnOff_Button" Grid.Row="3" Grid.Column="2"  Grid.ColumnSpan="2"
+                <Button Name="ChargerOnOff_Button" Grid.Row="2" Grid.Column="2"  Grid.ColumnSpan="2"
                 Margin="10,5" 
                 Content="{Binding OnOffButtonTxt, Source={StaticResource CommunicatorVM}}"
                 Command="{Binding ChargerOnOffClick, Source={StaticResource CommunicatorVM}}"/>
 
+                <CheckBox x:Name="SynchronousMode_CheckBox" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4"
+                Content="Synchronous Mode" HorizontalAlignment="Left" Margin="10,10"
+                IsChecked="{Binding SynchronousMode, Source={StaticResource CommunicatorVM}}"/>
+                
                 <TextBox Name="DutyCycleInput_TextBox" Grid.Row="4" Grid.Column="0"
                     Background="WhiteSmoke" Margin="10,5"
                     Text="{Binding DutyCycleInputTxt, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Source={StaticResource CommunicatorVM}}" />
@@ -289,7 +290,7 @@
         </GroupBox>
 
         <GroupBox Header="User Interface" Name="UserInterface_GroupBox" Grid.Column="2" Grid.Row="4" Grid.ColumnSpan="2" Margin="10,10,10,10"
-            Height="180"
+            Height="190"
             Visibility="{Binding ChargerDisplayVisibility, Mode=TwoWay, Source={StaticResource CommunicatorVM}}">
             <Grid>
                 <Grid.ColumnDefinitions>

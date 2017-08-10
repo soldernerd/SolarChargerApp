@@ -25,6 +25,28 @@ namespace SolarChargerApp
             InitializeComponent();
             parentWindow = mainWin;
             this.MaxHeight = SystemParameters.VirtualScreenHeight-50;
+
+            //Add items to dropdown menue for RTC calibration
+            for (int i = -128; i < 128; ++i)
+            {
+                ComboBoxItem itm = new ComboBoxItem();
+                itm.Name = string.Format("Value_{0:D3}", i + 128);
+                if (i<0)
+                {
+                    itm.Content = string.Format("Slower by {0:F2} seconds per day", (1 / Math.Pow(2, 15)) * 4 * Math.Abs(i) * 60 * 24);
+                }
+                else if (i > 0)
+                {
+                    itm.Content = string.Format("Faster by {0:F2} seconds per day", (1 / Math.Pow(2, 15)) * 4 * Math.Abs(i) * 60 * 24);
+                }
+                else if (i == 0)
+                {
+                    itm.IsSelected = true;
+                    itm.Content = "No correction";
+                }
+                this.RtcCalibration_ComboBox.Items.Add(itm);
+            }
+
         }
 
         private void CalibrationWindowClose(object sender, EventArgs e)
