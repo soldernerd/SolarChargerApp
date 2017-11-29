@@ -1,0 +1,102 @@
+﻿<Window x:Class="SolarChargerApp.LogWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SolarChargerApp"
+        mc:Ignorable="d"
+        Title="Convert Log" 
+        Closing="LogWindowClose"
+        SizeToContent="WidthAndHeight"
+        WindowState="Normal"
+        ResizeMode="CanMinimize"
+        ScrollViewer.CanContentScroll="True"
+        >
+
+    <Window.DataContext>
+        <StaticResourceExtension ResourceKey="CommunicatorVM"/>
+    </Window.DataContext>
+
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+
+        <Grid Height="Auto" Width="Auto" Margin="10,10,10,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <GroupBox Header="Input File" Grid.Column="0" Grid.Row="0" Margin="10,10,10,10">
+                <Grid Margin="10,10,10,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <!-- Row 0-->
+                    <Button Name="SelectInputFile_Button" Grid.Row="0" 
+                        HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" IsEnabled="true" Width="120" Height="25"
+                        Click="SelectInputFile_Click">
+                        Select input file
+                    </Button>
+                    <!-- Row 1-->
+                    <TextBox Grid.Column="0" Grid.Row="1"
+                    Name="InputFile_Textbox" 
+                    Text="{Binding LogInputFileTxt, Mode=OneWayToSource, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" 
+                    IsEnabled="True" Background="WhiteSmoke" Margin="10,3"/>
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Header="Output File" Grid.Column="0" Grid.Row="1" Margin="10,10,10,10">
+                <Grid Margin="10,10,10,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <!-- Row 0-->
+                    <Button Name="SelectOutputFile_Button" Grid.Row="0" 
+                        HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" IsEnabled="true" Width="120" Height="25"
+                        Click="SelectOutputFile_Click">
+                        Select input file
+                    </Button>
+                    <!-- Row 1-->
+                    <TextBox Grid.Column="0" Grid.Row="1"
+                    Name="OutputFile_Textbox" 
+                    Text="{Binding LogOutputFileTxt, Mode=OneWayToSource, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" 
+                    IsEnabled="True" Background="WhiteSmoke" Margin="10,3"/>
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Header="Convert File" Grid.Column="0" Grid.Row="4" Margin="10,10,10,10">
+                <Grid Margin="10,10,10,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*" />
+                    </Grid.RowDefinitions>
+                    <Button Name="StartConversion_Button" Grid.Column="0" 
+                        Click="StartConversion_Click"
+                        HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"
+                        IsEnabled="true" Width="120" Height="35">
+                        Start conversion
+                    </Button>
+                </Grid>
+            </GroupBox>
+
+        </Grid>
+
+    </ScrollViewer>
+
+</Window>

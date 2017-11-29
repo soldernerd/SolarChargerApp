@@ -28,6 +28,7 @@ namespace SolarChargerApp
         public CalibrationWindow CalibrationWin;
         public SettingsWindow SettingsWin;
         public DeviceWindow DeviceWin;
+        public LogWindow LogWin;
 
         public MainWindow()
         {
@@ -47,6 +48,10 @@ namespace SolarChargerApp
             if (CalibrationWin != null)
             {
                 CalibrationWin.Close();
+            }
+            if (LogWin != null)
+            {
+                LogWin.Close();
             }
         }
 
@@ -195,6 +200,17 @@ namespace SolarChargerApp
             CalibrationWin.Show();
             CalibrationWin.WindowState = WindowState.Normal;
             CalibrationWin.Focus();
+        }
+
+        private void menu_window_log(object sender, EventArgs e)
+        {
+            if (LogWin == null)
+            {
+                LogWin = new LogWindow(this);
+            }
+            LogWin.Show();
+            LogWin.WindowState = WindowState.Normal;
+            LogWin.Focus();
         }
     }
 }

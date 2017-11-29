@@ -49,6 +49,7 @@
             <MenuItem Header="Connection" Click="menu_window_device"/>
             <MenuItem Header="Settings" Click="menu_window_settings"/>
             <MenuItem Header="Calibration" Click="menu_window_calibration"/>
+            <MenuItem Header="Data Logging" Click="menu_window_log"/>
             <MenuItem Header="_About"   Click="menu_window_about"/>
         </Menu>
 
