@@ -35,7 +35,7 @@ namespace ConfigurationFile
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -102,7 +102,8 @@ namespace ConfigurationFile
             List<Tag> tags = new List<Tag>();
             tags.Add(new Tag("Config/Device/VendorId", "0x04D8"));
             tags.Add(new Tag("Config/Device/ProductId", "0xF08E"));
-            tags.Add(new Tag("Config/LogFile", "SolarCharger.csv"));
+            tags.Add(new Tag("Config/Logging/InputLogFile", "F:\\LOG.TXT"));
+            tags.Add(new Tag("Config/Logging/OutputLogFile", "SolarCharger.csv"));
             tags.Add(new Tag("Config/Window/Maximized", "False"));
             tags.Add(new Tag("Config/Window/PositionX", "100"));
             tags.Add(new Tag("Config/Window/PositionY", "100"));
@@ -223,6 +224,20 @@ namespace ConfigurationFile
         {
             get { return _getVisibility("/Config/Window/ConnectionDetails"); }
             set { _setVisibility("/Config/Window/ConnectionDetails", value); }
+        }
+
+        // Log file names
+
+        public string InputLogFile
+        {
+            get { return _getString("/Config/Logging/InputLogFile"); }
+            set { _setString("/Config/Logging/InputLogFile", value); }
+        }
+
+        public string OutputLogFile
+        {
+            get { return _getString("/Config/Logging/OutputLogFile"); }
+            set { _setString("/Config/Logging/OutputLogFile", value); }
         }
 
         // Decimally encoded unsigned integers

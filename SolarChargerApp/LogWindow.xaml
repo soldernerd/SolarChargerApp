@@ -49,7 +49,7 @@
                     <!-- Row 1-->
                     <TextBox Grid.Column="0" Grid.Row="1"
                     Name="InputFile_Textbox" 
-                    Text="{Binding LogInputFileTxt, Mode=OneWayToSource, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" 
+                    Text="{Binding LogInputFileTxt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Source={StaticResource CommunicatorVM}}" 
                     IsEnabled="True" Background="WhiteSmoke" Margin="10,3"/>
                 </Grid>
             </GroupBox>
@@ -67,12 +67,12 @@
                     <Button Name="SelectOutputFile_Button" Grid.Row="0" 
                         HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" IsEnabled="true" Width="120" Height="25"
                         Click="SelectOutputFile_Click">
-                        Select input file
+                        Select output file
                     </Button>
                     <!-- Row 1-->
                     <TextBox Grid.Column="0" Grid.Row="1"
                     Name="OutputFile_Textbox" 
-                    Text="{Binding LogOutputFileTxt, Mode=OneWayToSource, UpdateSourceTrigger=Explicit, Source={StaticResource CommunicatorVM}}" 
+                    Text="{Binding LogOutputFileTxt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Source={StaticResource CommunicatorVM}}" 
                     IsEnabled="True" Background="WhiteSmoke" Margin="10,3"/>
                 </Grid>
             </GroupBox>

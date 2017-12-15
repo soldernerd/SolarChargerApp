@@ -118,9 +118,9 @@ namespace SolarChargerApp
                 this.outputPower = 2.0 * ((double)BitConverter.ToUInt16(data, 14));
                 this.inputCapacity = (double) BitConverter.ToUInt16(data, 16);
                 this.outputCapacity = (double) BitConverter.ToUInt16(data, 18);
-                this.temperatureOnboard = 40.0 + ((double) data[20]);
-                this.temperatureExternal1 = 40.0 + ((double)data[21]);
-                this.temperatureExternal2 = 40.0 + ((double)data[22]);
+                this.temperatureOnboard = 0.5 * ((double) data[20]) - 40.0;
+                this.temperatureExternal1 = 0.5 * ((double)data[21]) - 40.0;
+                this.temperatureExternal2 = 0.5 * ((double)data[22]) - 40.0;
                 this.chargerOnTime = 2 * ((int)data[23]);
                 this.lowPowerTime = 2 * ((int)data[24]);
                 Byte status = data[30];
@@ -158,11 +158,11 @@ namespace SolarChargerApp
             override public string ToString()
             {
                 string separator = ";";
-                string s = dateTime.ToString();
-                s += this.inputVoltage.ToString() + separator;
+                string s = dateTime.ToString() + separator;
                 s += this.inputVoltage.ToString() + separator;
                 s += this.inputCurrent.ToString() + separator;
                 s += this.outputVoltage.ToString() + separator;
+                s += this.outputCurrent.ToString() + separator;
                 s += this.outputCurrent.ToString() + separator;
                 s += this.inputPower.ToString() + separator;
                 s += this.outputPower.ToString() + separator;
@@ -234,6 +234,7 @@ namespace SolarChargerApp
             string outFile = OutputFile_Textbox.Text;
             int numberOfEntries = 0;
             if (File.Exists(inFile))
+            try
             {
                 using (BinaryReader reader = new BinaryReader(File.Open(inFile, FileMode.Open)))
                 {
@@ -262,9 +263,12 @@ namespace SolarChargerApp
                 }
                 //We're done parsing the input file
                 //Write the output file
-                string msg = string.Format("{0}\n{1}\nRecords: {2}", inFile, outFile, entries.Count.ToString());
-                //MessageBox.Show(msg);
                 WriteCsv(outFile, entries);
+                MessageBox.Show("Successfully converted log file.");
+            }
+            catch
+            {
+                MessageBox.Show("Can't convert input file.");
             }
         }
 

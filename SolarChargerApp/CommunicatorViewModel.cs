@@ -1700,6 +1700,19 @@ namespace SolarChargerApp
                 WriteLog(string.Format("CalibrationRealTimeClock set to : {0:D}", new_value), false);
             }
         }
+
+        public string LogInputFileTxt
+        {
+            get { return config.InputLogFile; }
+            set { config.InputLogFile = value; }
+        }
+
+        public string LogOutputFileTxt
+        {
+            get { return config.OutputLogFile; }
+            set { config.OutputLogFile = value; }
+        }
+
     }
 
 }
