@@ -114,13 +114,13 @@ namespace SolarChargerApp
                 this.inputCurrent = 0.001 * ((double) BitConverter.ToUInt16(data, 6));
                 this.outputVoltage = 0.001 * ((double) BitConverter.ToUInt16(data, 8));
                 this.outputCurrent = 0.001 * ((double) BitConverter.ToUInt16(data, 10));
-                this.inputPower = 2.0 * ((double)BitConverter.ToUInt16(data, 12));
-                this.outputPower = 2.0 * ((double)BitConverter.ToUInt16(data, 14));
+                this.inputPower = 0.002 * ((double)BitConverter.ToUInt16(data, 12));
+                this.outputPower = 0.002 * ((double)BitConverter.ToUInt16(data, 14));
                 this.inputCapacity = (double) BitConverter.ToUInt16(data, 16);
                 this.outputCapacity = (double) BitConverter.ToUInt16(data, 18);
-                this.temperatureOnboard = 0.5 * ((double) data[20]) - 40.0;
-                this.temperatureExternal1 = 0.5 * ((double)data[21]) - 40.0;
-                this.temperatureExternal2 = 0.5 * ((double)data[22]) - 40.0;
+                this.temperatureOnboard = -40.0 + (0.5 * ((double) data[20]));
+                this.temperatureExternal1 = -40.0 + (0.5 * ((double)data[21]));
+                this.temperatureExternal2 = -40.0 + (0.5 * ((double)data[22]));
                 this.chargerOnTime = 2 * ((int)data[23]);
                 this.lowPowerTime = 2 * ((int)data[24]);
                 Byte status = data[30];
@@ -162,7 +162,6 @@ namespace SolarChargerApp
                 s += this.inputVoltage.ToString() + separator;
                 s += this.inputCurrent.ToString() + separator;
                 s += this.outputVoltage.ToString() + separator;
-                s += this.outputCurrent.ToString() + separator;
                 s += this.outputCurrent.ToString() + separator;
                 s += this.inputPower.ToString() + separator;
                 s += this.outputPower.ToString() + separator;
