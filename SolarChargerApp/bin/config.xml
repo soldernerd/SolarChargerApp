@@ -1,0 +1,20 @@
+<Config>
+  <Device>
+    <VendorId>0x04D8</VendorId>
+    <ProductId>0xF08E</ProductId>
+  </Device>
+  <LogFile>SolarCharger.csv</LogFile>
+  <Window>
+    <Maximized>False</Maximized>
+    <PositionX>861</PositionX>
+    <PositionY>162</PositionY>
+    <Outputs>Visible</Outputs>
+    <ChargerDisplay>Visible</ChargerDisplay>
+    <ActivityLog>Collapsed</ActivityLog>
+    <ConnectionDetails>Visible</ConnectionDetails>
+  </Window>
+  <Logging>
+    <InputLogFile>E:\LOG.TXT</InputLogFile>
+    <OutputLogFile>C:\Users\luke\Desktop\log.csv</OutputLogFile>
+  </Logging>
+</Config>
